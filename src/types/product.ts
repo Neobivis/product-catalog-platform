@@ -11,6 +11,7 @@ export interface Product {
   category: string;
   images: string[];
   currentImageIndex: number;
+  description?: string;
   tnved?: string;
   material?: string;
   purpose?: string;

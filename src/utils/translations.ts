@@ -44,6 +44,7 @@ export const translations = {
     main: 'Главное',
     inDevelopment: 'Раздел в разработке',
     functionalityWillBeAdded: 'будет добавлен в следующих версиях',
+    description: 'Описание и вопросы',
     tnved: 'ТН ВЭД',
     material: 'Материал',
     purpose: 'Предназначение',
