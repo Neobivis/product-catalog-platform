@@ -830,8 +830,11 @@ const Index = () => {
                         <div className="space-y-3">
                           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                             <div className="flex items-center gap-2 w-16">
-                              <span className="font-semibold text-sm">EN</span>
-                              <span className="text-lg">🇺🇸</span>
+                              <div className="w-6 h-4 bg-red-500 relative rounded-sm overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-white to-red-500"></div>
+                                <div className="absolute top-0 left-0 w-2 h-2 bg-blue-600"></div>
+                                <span className="text-xs font-bold text-white absolute top-0 left-1">US</span>
+                              </div>
                             </div>
                             <div className="flex-1">
                               <span className="text-sm">{product.nameEn}</span>
@@ -840,8 +843,10 @@ const Index = () => {
                           
                           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                             <div className="flex items-center gap-2 w-16">
-                              <span className="font-semibold text-sm">CN</span>
-                              <span className="text-lg">🇨🇳</span>
+                              <div className="w-6 h-4 bg-red-500 relative rounded-sm overflow-hidden">
+                                <div className="absolute top-0 left-0 w-2 h-4 bg-red-600"></div>
+                                <span className="text-xs font-bold text-yellow-400 absolute top-0 left-2">CN</span>
+                              </div>
                             </div>
                             <div className="flex-1">
                               <span className="text-sm">{product.nameCn}</span>
@@ -850,8 +855,12 @@ const Index = () => {
                           
                           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                             <div className="flex items-center gap-2 w-16">
-                              <span className="font-semibold text-sm">RU</span>
-                              <span className="text-lg">🇷🇺</span>
+                              <div className="w-6 h-4 relative rounded-sm overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-white"></div>
+                                <div className="absolute top-1 left-0 w-full h-1 bg-blue-600"></div>
+                                <div className="absolute top-2 left-0 w-full h-1 bg-red-600"></div>
+                                <span className="text-xs font-bold text-white absolute top-0 left-1">RU</span>
+                              </div>
                             </div>
                             <div className="flex-1">
                               <span className="text-sm">{product.nameRu}</span>
@@ -988,15 +997,27 @@ const Index = () => {
                           {/* Multi-language Names */}
                           <div className="space-y-2">
                             <div className="flex items-center gap-3">
-                              <span className="text-lg">🇺🇸</span>
+                              <div className="w-6 h-4 bg-red-500 relative rounded-sm overflow-hidden flex-shrink-0">
+                                <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-white to-red-500"></div>
+                                <div className="absolute top-0 left-0 w-2 h-2 bg-blue-600"></div>
+                                <span className="text-xs font-bold text-white absolute top-0 left-1">US</span>
+                              </div>
                               <span className="font-semibold">{product.nameEn}</span>
                             </div>
                             <div className="flex items-center gap-3">
-                              <span className="text-lg">🇨🇳</span>
+                              <div className="w-6 h-4 bg-red-500 relative rounded-sm overflow-hidden flex-shrink-0">
+                                <div className="absolute top-0 left-0 w-2 h-4 bg-red-600"></div>
+                                <span className="text-xs font-bold text-yellow-400 absolute top-0 left-2">CN</span>
+                              </div>
                               <span className="text-sm text-gray-600">{product.nameCn}</span>
                             </div>
                             <div className="flex items-center gap-3">
-                              <span className="text-lg">🇷🇺</span>
+                              <div className="w-6 h-4 relative rounded-sm overflow-hidden flex-shrink-0">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-white"></div>
+                                <div className="absolute top-1 left-0 w-full h-1 bg-blue-600"></div>
+                                <div className="absolute top-2 left-0 w-full h-1 bg-red-600"></div>
+                                <span className="text-xs font-bold text-white absolute top-0 left-1">RU</span>
+                              </div>
                               <span className="text-sm text-gray-600">{product.nameRu}</span>
                             </div>
                           </div>
@@ -1117,7 +1138,11 @@ const Index = () => {
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2 w-16">
-                            <span className="text-lg">🇺🇸</span>
+                            <div className="w-6 h-4 bg-red-500 relative rounded-sm overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-white to-red-500"></div>
+                              <div className="absolute top-0 left-0 w-2 h-2 bg-blue-600"></div>
+                              <span className="text-xs font-bold text-white absolute top-0 left-1">US</span>
+                            </div>
                           </div>
                           <div className="flex-1">
                             <EditableField
@@ -1130,7 +1155,10 @@ const Index = () => {
                         
                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2 w-16">
-                            <span className="text-lg">🇨🇳</span>
+                            <div className="w-6 h-4 bg-red-500 relative rounded-sm overflow-hidden">
+                              <div className="absolute top-0 left-0 w-2 h-4 bg-red-600"></div>
+                              <span className="text-xs font-bold text-yellow-400 absolute top-0 left-2">CN</span>
+                            </div>
                           </div>
                           <div className="flex-1">
                             <EditableField
@@ -1143,7 +1171,12 @@ const Index = () => {
                         
                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2 w-16">
-                            <span className="text-lg">🇷🇺</span>
+                            <div className="w-6 h-4 relative rounded-sm overflow-hidden">
+                              <div className="absolute top-0 left-0 w-full h-1 bg-white"></div>
+                              <div className="absolute top-1 left-0 w-full h-1 bg-blue-600"></div>
+                              <div className="absolute top-2 left-0 w-full h-1 bg-red-600"></div>
+                              <span className="text-xs font-bold text-white absolute top-0 left-1">RU</span>
+                            </div>
                           </div>
                           <div className="flex-1">
                             <EditableField
