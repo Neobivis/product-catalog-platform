@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { Language } from '@/types/product';
-import { translateDescriptions } from '@/utils/translation';
 
 interface MultiLanguageTextFieldProps {
   productId: string;
@@ -32,7 +31,6 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
 }) => {
   const [viewLanguage, setViewLanguage] = useState<'ru' | 'en' | 'cn'>('ru');
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isTranslating, setIsTranslating] = useState(false);
   const [textValue, setTextValue] = useState(valueRu);
   const isEditing = editingField?.productId === productId && editingField?.field === field;
 
@@ -51,21 +49,21 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
     ];
   };
 
+  // Check if translation tab should be highlighted red (Russian has text but translation is empty)
+  const isTranslationOutdated = (langCode: 'en' | 'cn') => {
+    if (!valueRu.trim()) return false; // No Russian text, no need for translation
+    
+    if (langCode === 'en') {
+      return !valueEn.trim(); // Russian has text but English is empty
+    } else {
+      return !valueCn.trim(); // Russian has text but Chinese is empty
+    }
+  };
+
   const availableLanguages = getAvailableLanguages();
   const currentValue = availableLanguages.find(lang => lang.code === viewLanguage)?.value || '';
 
-  // Debug current values
-  React.useEffect(() => {
-    console.log('MultiLanguageTextField props updated:', {
-      productId,
-      field,
-      valueRu,
-      valueEn,
-      valueCn,
-      viewLanguage,
-      currentValue
-    });
-  }, [productId, field, valueRu, valueEn, valueCn, viewLanguage, currentValue]);
+
 
   // Ensure viewLanguage is available
   React.useEffect(() => {
@@ -101,38 +99,7 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
     }
   };
 
-  const handleManualTranslate = async () => {
-    if (!valueRu.trim()) return;
-    
-    setIsTranslating(true);
-    
-    try {
-      console.log('=== TRANSLATION DEBUG ===');
-      console.log('Source Russian text:', JSON.stringify(valueRu));
-      
-      // Copy Russian text and translate it
-      const translations = await translateDescriptions(valueRu);
-      console.log('Raw translation results:', JSON.stringify(translations));
-      
-      // Verify translations are different from source
-      console.log('EN different from RU?', translations.en !== valueRu);
-      console.log('CN different from RU?', translations.cn !== valueRu);
-      
-      // Save English translation
-      console.log('Saving EN translation:', JSON.stringify(translations.en));
-      onFieldEdit(productId, `${field}En`, translations.en);
-      
-      // Save Chinese translation  
-      console.log('Saving CN translation:', JSON.stringify(translations.cn));
-      onFieldEdit(productId, `${field}Cn`, translations.cn);
-      
-      console.log('=== TRANSLATION COMPLETE ===');
-    } catch (error) {
-      console.error('Manual translation failed:', error);
-    } finally {
-      setIsTranslating(false);
-    }
-  };
+
 
   // Update textValue when valueRu changes or editing starts
   React.useEffect(() => {
@@ -167,12 +134,6 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
               {lang.label}
             </Button>
           ))}
-          {isTranslating && (
-            <div className="flex items-center gap-1 ml-2">
-              <Icon name="Loader2" size={12} className="animate-spin" />
-              <span className="text-xs text-gray-500">Переводим...</span>
-            </div>
-          )}
         </div>
         
         <div className="relative">
@@ -218,7 +179,7 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
         </div>
         
         <div className="text-xs text-gray-500 mt-1">
-          Ctrl+Enter для сохранения, Escape для отмены. Используйте кнопку "Перевести" для создания переводов.
+          Ctrl+Enter для сохранения, Escape для отмены. Вкладки EN/CN будут подсвечены красным, если требуется обновление перевода.
         </div>
       </div>
     );
@@ -227,38 +188,24 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
   return (
     <div className="w-full group">
       <div className="flex items-center gap-2 mb-3">
-        {availableLanguages.map((lang) => (
-          <Button
-            key={lang.code}
-            variant={viewLanguage === lang.code ? 'default' : 'outline'}
-            size="sm"
-            className="h-6 px-2 text-xs"
-            onClick={() => setViewLanguage(lang.code)}
-          >
-            {lang.label}
-          </Button>
-        ))}
-        
-        {/* Manual translate button */}
-        {valueRu && !isTranslating && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800"
-            onClick={handleManualTranslate}
-            disabled={!valueRu.trim()}
-          >
-            <Icon name="RotateCcw" size={12} className="mr-1" />
-            Перевести
-          </Button>
-        )}
-        
-        {isTranslating && (
-          <div className="flex items-center gap-1">
-            <Icon name="Loader2" size={12} className="animate-spin" />
-            <span className="text-xs text-gray-500">Переводим...</span>
-          </div>
-        )}
+        {availableLanguages.map((lang) => {
+          const isOutdated = (lang.code === 'en' || lang.code === 'cn') && isTranslationOutdated(lang.code);
+          return (
+            <Button
+              key={lang.code}
+              variant={viewLanguage === lang.code ? 'default' : 'outline'}
+              size="sm"
+              className={`h-6 px-2 text-xs ${
+                isOutdated 
+                  ? 'border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700' 
+                  : ''
+              }`}
+              onClick={() => setViewLanguage(lang.code)}
+            >
+              {lang.label}
+            </Button>
+          );
+        })}
       </div>
       
       <div className="flex items-start justify-between gap-3">
