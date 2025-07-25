@@ -1,0 +1,355 @@
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Icon from '@/components/ui/icon';
+import EditableField from '@/components/EditableField';
+import { Product, Language } from '@/types/product';
+
+interface ProductCatalogProps {
+  products: Product[];
+  language: Language;
+  translations: any;
+  editingField: {productId: string, field: string} | null;
+  setEditingField: (field: {productId: string, field: string} | null) => void;
+  onFieldEdit: (productId: string, field: string, value: string | number) => void;
+  onImageNavigation: (productId: string, direction: 'prev' | 'next') => void;
+  onShowImageManager: (productId: string) => void;
+}
+
+const FlagIcon: React.FC<{ country: 'us' | 'cn' | 'ru' }> = ({ country }) => {
+  switch (country) {
+    case 'us':
+      return (
+        <div className="w-6 h-4 bg-red-500 relative rounded-sm overflow-hidden flex-shrink-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-white to-red-500"></div>
+          <div className="absolute top-0 left-0 w-2 h-2 bg-blue-600"></div>
+          <span className="text-xs font-bold text-white absolute top-0 left-1">US</span>
+        </div>
+      );
+    case 'cn':
+      return (
+        <div className="w-6 h-4 bg-red-500 relative rounded-sm overflow-hidden flex-shrink-0">
+          <div className="absolute top-0 left-0 w-2 h-4 bg-red-600"></div>
+          <span className="text-xs font-bold text-yellow-400 absolute top-0 left-2">CN</span>
+        </div>
+      );
+    case 'ru':
+      return (
+        <div className="w-6 h-4 relative rounded-sm overflow-hidden flex-shrink-0">
+          <div className="absolute top-0 left-0 w-full h-1 bg-white"></div>
+          <div className="absolute top-1 left-0 w-full h-1 bg-blue-600"></div>
+          <div className="absolute top-2 left-0 w-full h-1 bg-red-600"></div>
+          <span className="text-xs font-bold text-white absolute top-0 left-1">RU</span>
+        </div>
+      );
+  }
+};
+
+const ProductCatalog: React.FC<ProductCatalogProps> = ({
+  products,
+  language,
+  translations: t,
+  editingField,
+  setEditingField,
+  onFieldEdit,
+  onImageNavigation,
+  onShowImageManager
+}) => {
+  return (
+    <div className="space-y-6">
+      {products.map(product => (
+        <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              {/* Product Images */}
+              <div className="order-1 lg:order-1 col-span-1 lg:col-span-3">
+                <div className="space-y-4">
+                  {/* Main Image */}
+                  <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={product.images[product.currentImageIndex]}
+                      alt={product.nameEn}
+                      className="w-full h-full object-cover"
+                    />
+                    {product.images.length > 1 && (
+                      <>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                          onClick={() => onImageNavigation(product.id, 'prev')}
+                        >
+                          <Icon name="ChevronLeft" size={16} />
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                          onClick={() => onImageNavigation(product.id, 'next')}
+                        >
+                          <Icon name="ChevronRight" size={16} />
+                        </Button>
+                      </>
+                    )}
+                    
+                    {/* Image Management Button */}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute bottom-2 right-2 h-8 w-8 p-0"
+                      onClick={() => onShowImageManager(product.id)}
+                    >
+                      <Icon name="ImagePlus" size={16} />
+                    </Button>
+                  </div>
+                  
+                  {/* Thumbnails */}
+                  {product.images.length > 1 && (
+                    <div className="flex gap-2 overflow-x-auto">
+                      {product.images.map((image, index) => (
+                        <button
+                          key={index}
+                          className={`flex-shrink-0 w-16 h-16 rounded border-2 overflow-hidden ${
+                            index === product.currentImageIndex 
+                              ? 'border-blue-500' 
+                              : 'border-gray-200'
+                          }`}
+                          onClick={() => onImageNavigation(product.id, index === product.currentImageIndex ? 'next' : 'prev')}
+                        >
+                          <img
+                            src={image}
+                            alt={`${product.nameEn} thumbnail ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Product Details */}
+              <div className="order-2 lg:order-2 col-span-1 lg:col-span-9 space-y-6">
+                
+                {/* Multi-language Names */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2 w-16">
+                      <FlagIcon country="us" />
+                    </div>
+                    <div className="flex-1">
+                      <EditableField
+                        productId={product.id}
+                        field="nameEn"
+                        value={product.nameEn}
+                        editingField={editingField}
+                        setEditingField={setEditingField}
+                        onFieldEdit={onFieldEdit}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2 w-16">
+                      <FlagIcon country="cn" />
+                    </div>
+                    <div className="flex-1">
+                      <EditableField
+                        productId={product.id}
+                        field="nameCn"
+                        value={product.nameCn}
+                        editingField={editingField}
+                        setEditingField={setEditingField}
+                        onFieldEdit={onFieldEdit}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2 w-16">
+                      <FlagIcon country="ru" />
+                    </div>
+                    <div className="flex-1">
+                      <EditableField
+                        productId={product.id}
+                        field="nameRu"
+                        value={product.nameRu}
+                        editingField={editingField}
+                        setEditingField={setEditingField}
+                        onFieldEdit={onFieldEdit}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Product Properties */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                      <span className="font-semibold text-sm w-20">{t.priceField}</span>
+                      <div className="flex-1">
+                        <EditableField
+                          productId={product.id}
+                          field="price"
+                          value={`$${product.price}`}
+                          type="text"
+                          editingField={editingField}
+                          setEditingField={setEditingField}
+                          onFieldEdit={onFieldEdit}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                      <span className="font-semibold text-sm w-20">{t.skuField}</span>
+                      <div className="flex-1">
+                        <EditableField
+                          productId={product.id}
+                          field="sku"
+                          value={product.sku}
+                          editingField={editingField}
+                          setEditingField={setEditingField}
+                          onFieldEdit={onFieldEdit}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                      <span className="font-semibold text-sm w-20">{t.quantityField}</span>
+                      <div className="flex-1">
+                        <EditableField
+                          productId={product.id}
+                          field="quantity"
+                          value={product.quantity}
+                          type="number"
+                          editingField={editingField}
+                          setEditingField={setEditingField}
+                          onFieldEdit={onFieldEdit}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                      <span className="font-semibold text-sm w-20">{t.brandField}</span>
+                      <div className="flex-1">
+                        <EditableField
+                          productId={product.id}
+                          field="brand"
+                          value={product.brand}
+                          editingField={editingField}
+                          setEditingField={setEditingField}
+                          onFieldEdit={onFieldEdit}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                      <span className="font-semibold text-sm w-20">{t.webLinkField}</span>
+                      <div className="flex-1">
+                        <EditableField
+                          productId={product.id}
+                          field="webLink"
+                          value={product.webLink}
+                          editingField={editingField}
+                          setEditingField={setEditingField}
+                          onFieldEdit={onFieldEdit}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                      <span className="font-semibold text-sm w-20">{t.categoryField}</span>
+                      <div className="flex-1">
+                        <EditableField
+                          productId={product.id}
+                          field="category"
+                          value={product.category}
+                          editingField={editingField}
+                          setEditingField={setEditingField}
+                          onFieldEdit={onFieldEdit}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Russian-specific fields */}
+                {language === 'ru' && (
+                  <div className="border-t pt-4 mt-4">
+                    <h4 className="font-semibold text-sm text-gray-700 mb-3">Российские сертификаты</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                          <span className="font-semibold text-sm w-20">{t.tnved}</span>
+                          <div className="flex-1">
+                            <EditableField
+                              productId={product.id}
+                              field="tnved"
+                              value={product.tnved || ''}
+                              editingField={editingField}
+                              setEditingField={setEditingField}
+                              onFieldEdit={onFieldEdit}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                          <span className="font-semibold text-sm w-20">{t.material}</span>
+                          <div className="flex-1">
+                            <EditableField
+                              productId={product.id}
+                              field="material"
+                              value={product.material || ''}
+                              editingField={editingField}
+                              setEditingField={setEditingField}
+                              onFieldEdit={onFieldEdit}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                          <span className="font-semibold text-sm w-20">{t.purpose}</span>
+                          <div className="flex-1">
+                            <EditableField
+                              productId={product.id}
+                              field="purpose"
+                              value={product.purpose || ''}
+                              editingField={editingField}
+                              setEditingField={setEditingField}
+                              onFieldEdit={onFieldEdit}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                          <span className="font-semibold text-sm w-20">{t.forWhom}</span>
+                          <div className="flex-1">
+                            <EditableField
+                              productId={product.id}
+                              field="forWhom"
+                              value={product.forWhom || ''}
+                              editingField={editingField}
+                              setEditingField={setEditingField}
+                              onFieldEdit={onFieldEdit}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+};
+
+export default ProductCatalog;
