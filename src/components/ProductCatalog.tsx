@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import EditableField from '@/components/EditableField';
+import PriceField from '@/components/PriceField';
 import { Product, Language } from '@/types/product';
 
 interface ProductCatalogProps {
@@ -189,11 +190,10 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                     <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
                       <span className="font-semibold text-sm w-20">{t.priceField}</span>
                       <div className="flex-1">
-                        <EditableField
+                        <PriceField
                           productId={product.id}
                           field="price"
-                          value={`$${product.price}`}
-                          type="text"
+                          value={product.price}
                           editingField={editingField}
                           setEditingField={setEditingField}
                           onFieldEdit={onFieldEdit}

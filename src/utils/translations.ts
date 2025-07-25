@@ -12,7 +12,7 @@ export const translations = {
     products: 'товаров',
     categories: 'Категории',
     brands: 'Бренды',
-    price: 'Цена',
+    price: 'Цена (в юанях)',
     from: 'От',
     to: 'До',
     shown: 'Показано',
