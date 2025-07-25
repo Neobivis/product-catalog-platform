@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import Icon from '@/components/ui/icon';
 
 interface Product {
@@ -20,7 +25,14 @@ interface Product {
   currentImageIndex: number;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  children?: Category[];
+}
+
 const Index = () => {
+  // Sample data with more products
   const [products, setProducts] = useState<Product[]>([
     {
       id: '1',
@@ -32,7 +44,7 @@ const Index = () => {
       quantity: 45,
       brand: 'TechBrand',
       webLink: 'https://example.com/headphones',
-      category: 'Electronics',
+      category: 'Electronics/Audio',
       images: ['/img/cf9d4e6b-0b84-40fa-8944-4ddf188a111f.jpg', '/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
       currentImageIndex: 0
     },
@@ -46,14 +58,118 @@ const Index = () => {
       quantity: 78,
       brand: 'FitTech',
       webLink: 'https://example.com/tracker',
-      category: 'Wearables',
+      category: 'Electronics/Wearables',
       images: ['/img/c817e33c-f23e-46f9-8803-0e914e9017bd.jpg', '/img/cf9d4e6b-0b84-40fa-8944-4ddf188a111f.jpg'],
+      currentImageIndex: 0
+    },
+    {
+      id: '3',
+      nameEn: 'Gaming Laptop',
+      nameCn: '游戏笔记本电脑',
+      nameRu: 'Игровой ноутбук',
+      price: 1299.99,
+      sku: 'GL-2024-RTX',
+      quantity: 23,
+      brand: 'GameTech',
+      webLink: 'https://example.com/laptop',
+      category: 'Electronics/Computers',
+      images: ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
       currentImageIndex: 0
     }
   ]);
 
+  const [categories] = useState<Category[]>([
+    {
+      id: 'electronics',
+      name: 'Electronics',
+      children: [
+        { id: 'audio', name: 'Audio' },
+        { id: 'wearables', name: 'Wearables' },
+        { id: 'computers', name: 'Computers' }
+      ]
+    },
+    {
+      id: 'clothing',
+      name: 'Clothing',
+      children: [
+        { id: 'shirts', name: 'Shirts' },
+        { id: 'pants', name: 'Pants' }
+      ]
+    },
+    {
+      id: 'home',
+      name: 'Home & Garden'
+    }
+  ]);
+
+  // State management
   const [editingField, setEditingField] = useState<{productId: string, field: string} | null>(null);
   const [activeTab, setActiveTab] = useState('catalog');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<{min: number, max: number}>({min: 0, max: 2000});
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newProduct, setNewProduct] = useState<Partial<Product>>({
+    nameEn: '',
+    nameCn: '',
+    nameRu: '',
+    price: 0,
+    sku: '',
+    quantity: 0,
+    brand: '',
+    webLink: '',
+    category: '',
+    images: ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
+    currentImageIndex: 0
+  });
+
+  // Get unique brands and categories
+  const brands = useMemo(() => 
+    [...new Set(products.map(p => p.brand))], [products]
+  );
+
+  const allCategories = useMemo(() => {
+    const flatCategories: string[] = [];
+    const traverse = (cats: Category[], prefix = '') => {
+      cats.forEach(cat => {
+        const fullPath = prefix ? `${prefix}/${cat.name}` : cat.name;
+        flatCategories.push(fullPath);
+        if (cat.children) {
+          traverse(cat.children, fullPath);
+        }
+      });
+    };
+    traverse(categories);
+    return flatCategories;
+  }, [categories]);
+
+  // Filter products
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      // Search filter
+      const searchLower = searchQuery.toLowerCase();
+      const matchesSearch = !searchQuery || 
+        product.nameEn.toLowerCase().includes(searchLower) ||
+        product.nameCn.toLowerCase().includes(searchLower) ||
+        product.nameRu.toLowerCase().includes(searchLower) ||
+        product.sku.toLowerCase().includes(searchLower) ||
+        product.brand.toLowerCase().includes(searchLower) ||
+        product.category.toLowerCase().includes(searchLower);
+
+      // Brand filter
+      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
+
+      // Category filter
+      const matchesCategory = selectedCategories.length === 0 || 
+        selectedCategories.some(cat => product.category.includes(cat));
+
+      // Price filter
+      const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
+
+      return matchesSearch && matchesBrand && matchesCategory && matchesPrice;
+    });
+  }, [products, searchQuery, selectedBrands, selectedCategories, priceRange]);
 
   const handleFieldEdit = (productId: string, field: string, value: string | number) => {
     setProducts(prev => prev.map(product => 
@@ -74,6 +190,56 @@ const Index = () => {
       }
       return product;
     }));
+  };
+
+  const handleAddProduct = () => {
+    if (newProduct.nameEn && newProduct.sku) {
+      const product: Product = {
+        id: Date.now().toString(),
+        nameEn: newProduct.nameEn || '',
+        nameCn: newProduct.nameCn || '',
+        nameRu: newProduct.nameRu || '',
+        price: newProduct.price || 0,
+        sku: newProduct.sku || '',
+        quantity: newProduct.quantity || 0,
+        brand: newProduct.brand || '',
+        webLink: newProduct.webLink || '',
+        category: newProduct.category || '',
+        images: newProduct.images || ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
+        currentImageIndex: 0
+      };
+      setProducts(prev => [...prev, product]);
+      setNewProduct({
+        nameEn: '',
+        nameCn: '',
+        nameRu: '',
+        price: 0,
+        sku: '',
+        quantity: 0,
+        brand: '',
+        webLink: '',
+        category: '',
+        images: ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
+        currentImageIndex: 0
+      });
+      setShowAddForm(false);
+    }
+  };
+
+  const toggleBrandFilter = (brand: string) => {
+    setSelectedBrands(prev => 
+      prev.includes(brand) 
+        ? prev.filter(b => b !== brand)
+        : [...prev, brand]
+    );
+  };
+
+  const toggleCategoryFilter = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
   };
 
   const EditableField = ({ 
@@ -124,12 +290,163 @@ const Index = () => {
     );
   };
 
+  const CategoryTree = ({ categories, level = 0 }: { categories: Category[], level?: number }) => (
+    <div className={`space-y-2 ${level > 0 ? 'ml-4' : ''}`}>
+      {categories.map(category => (
+        <div key={category.id} className="space-y-1">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id={category.id}
+              checked={selectedCategories.includes(category.name)}
+              onCheckedChange={() => toggleCategoryFilter(category.name)}
+            />
+            <Label htmlFor={category.id} className="text-sm font-medium">
+              {category.name}
+            </Label>
+          </div>
+          {category.children && (
+            <CategoryTree categories={category.children} level={level + 1} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Каталог товаров</h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold text-gray-900">Каталог товаров</h1>
+            
+            <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2">
+                  <Icon name="Plus" size={16} />
+                  Добавить товар
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Добавить новый товар</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="nameEn">Название (EN)</Label>
+                      <Input
+                        id="nameEn"
+                        value={newProduct.nameEn}
+                        onChange={(e) => setNewProduct(prev => ({...prev, nameEn: e.target.value}))}
+                        placeholder="Product name in English"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="nameCn">Название (CN)</Label>
+                      <Input
+                        id="nameCn"
+                        value={newProduct.nameCn}
+                        onChange={(e) => setNewProduct(prev => ({...prev, nameCn: e.target.value}))}
+                        placeholder="产品名称"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="nameRu">Название (RU)</Label>
+                    <Input
+                      id="nameRu"
+                      value={newProduct.nameRu}
+                      onChange={(e) => setNewProduct(prev => ({...prev, nameRu: e.target.value}))}
+                      placeholder="Название товара"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="price">Цена</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        value={newProduct.price}
+                        onChange={(e) => setNewProduct(prev => ({...prev, price: Number(e.target.value)}))}
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="sku">SKU</Label>
+                      <Input
+                        id="sku"
+                        value={newProduct.sku}
+                        onChange={(e) => setNewProduct(prev => ({...prev, sku: e.target.value}))}
+                        placeholder="PRODUCT-001"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="quantity">Количество</Label>
+                      <Input
+                        id="quantity"
+                        type="number"
+                        value={newProduct.quantity}
+                        onChange={(e) => setNewProduct(prev => ({...prev, quantity: Number(e.target.value)}))}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="brand">Бренд</Label>
+                      <Input
+                        id="brand"
+                        value={newProduct.brand}
+                        onChange={(e) => setNewProduct(prev => ({...prev, brand: e.target.value}))}
+                        placeholder="Brand Name"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="category">Категория</Label>
+                      <Select 
+                        value={newProduct.category} 
+                        onValueChange={(value) => setNewProduct(prev => ({...prev, category: value}))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите категорию" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {allCategories.map(cat => (
+                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="webLink">Веб-ссылка</Label>
+                      <Input
+                        id="webLink"
+                        value={newProduct.webLink}
+                        onChange={(e) => setNewProduct(prev => ({...prev, webLink: e.target.value}))}
+                        placeholder="https://example.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={() => setShowAddForm(false)}>
+                      Отмена
+                    </Button>
+                    <Button onClick={handleAddProduct}>
+                      Добавить товар
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
           
           {/* Navigation */}
           <nav className="flex space-x-1">
@@ -157,6 +474,258 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
+        
+        {/* Search Tab */}
+        {activeTab === 'search' && (
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg border">
+              <h3 className="text-lg font-semibold mb-4">Поиск товаров</h3>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Поиск по названию, SKU, бренду, категории..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <Button variant="outline">
+                  <Icon name="Search" size={16} />
+                </Button>
+              </div>
+              {searchQuery && (
+                <div className="mt-4">
+                  <Badge variant="secondary">
+                    Найдено: {filteredProducts.length} товаров
+                  </Badge>
+                </div>
+              )}
+            </div>
+            
+            {/* Search Results */}
+            <div className="space-y-6">
+              {filteredProducts.map(product => (
+                <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-12 gap-6">
+                      
+                      {/* Product Images */}
+                      <div className="col-span-3">
+                        <div className="space-y-4">
+                          <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                            <img
+                              src={product.images[product.currentImageIndex]}
+                              alt={product.nameEn}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Product Details */}
+                      <div className="col-span-9 space-y-4">
+                        
+                        {/* Multi-language Names */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-2 w-16">
+                              <span className="font-semibold text-sm">EN</span>
+                              <span className="text-lg">🇺🇸</span>
+                            </div>
+                            <div className="flex-1">
+                              <span className="text-sm">{product.nameEn}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-2 w-16">
+                              <span className="font-semibold text-sm">CN</span>
+                              <span className="text-lg">🇨🇳</span>
+                            </div>
+                            <div className="flex-1">
+                              <span className="text-sm">{product.nameCn}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-2 w-16">
+                              <span className="font-semibold text-sm">RU</span>
+                              <span className="text-lg">🇷🇺</span>
+                            </div>
+                            <div className="flex-1">
+                              <span className="text-sm">{product.nameRu}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Product Properties */}
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-xs text-gray-500">Цена</span>
+                            <span className="font-semibold">${product.price}</span>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-xs text-gray-500">SKU</span>
+                            <span className="font-semibold">{product.sku}</span>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-xs text-gray-500">Бренд</span>
+                            <span className="font-semibold">{product.brand}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Filters Tab */}
+        {activeTab === 'filters' && (
+          <div className="grid grid-cols-4 gap-6">
+            <div className="col-span-1 space-y-6">
+              {/* Category Filter */}
+              <Card>
+                <CardHeader>
+                  <h3 className="font-semibold">Категории</h3>
+                </CardHeader>
+                <CardContent>
+                  <CategoryTree categories={categories} />
+                </CardContent>
+              </Card>
+
+              {/* Brand Filter */}
+              <Card>
+                <CardHeader>
+                  <h3 className="font-semibold">Бренды</h3>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {brands.map(brand => (
+                      <div key={brand} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={brand}
+                          checked={selectedBrands.includes(brand)}
+                          onCheckedChange={() => toggleBrandFilter(brand)}
+                        />
+                        <Label htmlFor={brand} className="text-sm">
+                          {brand}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Price Filter */}
+              <Card>
+                <CardHeader>
+                  <h3 className="font-semibold">Цена</h3>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label htmlFor="minPrice" className="text-xs">От</Label>
+                        <Input
+                          id="minPrice"
+                          type="number"
+                          value={priceRange.min}
+                          onChange={(e) => setPriceRange(prev => ({...prev, min: Number(e.target.value)}))}
+                          className="h-8"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="maxPrice" className="text-xs">До</Label>
+                        <Input
+                          id="maxPrice"
+                          type="number"
+                          value={priceRange.max}
+                          onChange={(e) => setPriceRange(prev => ({...prev, max: Number(e.target.value)}))}
+                          className="h-8"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Filter Results */}
+              <div>
+                <Badge variant="outline" className="text-sm">
+                  Показано: {filteredProducts.length} товаров
+                </Badge>
+              </div>
+            </div>
+
+            {/* Filtered Products */}
+            <div className="col-span-3">
+              <div className="space-y-6">
+                {filteredProducts.map(product => (
+                  <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="grid grid-cols-12 gap-6">
+                        
+                        {/* Product Images */}
+                        <div className="col-span-4">
+                          <div className="space-y-4">
+                            <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                              <img
+                                src={product.images[product.currentImageIndex]}
+                                alt={product.nameEn}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Product Details */}
+                        <div className="col-span-8 space-y-4">
+                          
+                          {/* Multi-language Names */}
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                              <span className="text-lg">🇺🇸</span>
+                              <span className="font-semibold">{product.nameEn}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-lg">🇨🇳</span>
+                              <span className="text-sm text-gray-600">{product.nameCn}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-lg">🇷🇺</span>
+                              <span className="text-sm text-gray-600">{product.nameRu}</span>
+                            </div>
+                          </div>
+
+                          {/* Product Properties */}
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <span className="text-xs text-gray-500">Цена</span>
+                              <div className="font-semibold text-lg">${product.price}</div>
+                            </div>
+                            <div>
+                              <span className="text-xs text-gray-500">Количество</span>
+                              <div className="font-semibold">{product.quantity} шт.</div>
+                            </div>
+                            <div>
+                              <span className="text-xs text-gray-500">Категория</span>
+                              <div className="font-semibold">{product.category}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Catalog Tab */}
         {activeTab === 'catalog' && (
           <div className="space-y-6">
             {products.map(product => (
@@ -355,7 +924,7 @@ const Index = () => {
           </div>
         )}
 
-        {activeTab !== 'catalog' && (
+        {(activeTab === 'favorites' || activeTab === 'admin') && (
           <div className="text-center py-12">
             <Icon name="Construction" size={48} className="mx-auto mb-4 text-gray-400" />
             <h3 className="text-lg font-semibold text-gray-600 mb-2">Раздел в разработке</h3>
