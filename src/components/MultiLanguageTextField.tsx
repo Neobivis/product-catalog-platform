@@ -78,8 +78,14 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
   const displayText = isExpanded ? currentValue : truncated;
 
   const handleSave = (newRuText: string) => {
-    // Save Russian text only
+    // Save Russian text
     onFieldEdit(productId, field, newRuText);
+    
+    // If Russian text was edited or cleared, clear translations
+    if (newRuText.trim() !== valueRu.trim()) {
+      onFieldEdit(productId, `${field}En`, '');
+      onFieldEdit(productId, `${field}Cn`, '');
+    }
   };
 
   const handleManualTranslate = async () => {
@@ -88,19 +94,26 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
     setIsTranslating(true);
     
     try {
-      console.log('Copying and translating text:', valueRu);
+      console.log('=== TRANSLATION DEBUG ===');
+      console.log('Source Russian text:', JSON.stringify(valueRu));
       
       // Copy Russian text and translate it
       const translations = await translateDescriptions(valueRu);
-      console.log('Translation results:', translations);
+      console.log('Raw translation results:', JSON.stringify(translations));
+      
+      // Verify translations are different from source
+      console.log('EN different from RU?', translations.en !== valueRu);
+      console.log('CN different from RU?', translations.cn !== valueRu);
       
       // Save English translation
+      console.log('Saving EN translation:', JSON.stringify(translations.en));
       onFieldEdit(productId, `${field}En`, translations.en);
       
       // Save Chinese translation  
+      console.log('Saving CN translation:', JSON.stringify(translations.cn));
       onFieldEdit(productId, `${field}Cn`, translations.cn);
       
-      console.log('Translations copied to EN and CN fields');
+      console.log('=== TRANSLATION COMPLETE ===');
     } catch (error) {
       console.error('Manual translation failed:', error);
     } finally {

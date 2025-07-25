@@ -1,5 +1,7 @@
 // Simple translation service
 export const translateText = async (text: string, targetLanguage: 'en' | 'cn'): Promise<string> => {
+  console.log(`translateText called with: "${text}" -> ${targetLanguage}`);
+  
   if (!text.trim()) return '';
   
   try {
@@ -21,12 +23,15 @@ export const translateText = async (text: string, targetLanguage: 'en' | 'cn'): 
 
     // Try to find exact match first
     const exactMatch = translations[targetLanguage][text];
+    console.log(`Exact match found for "${text}":`, exactMatch);
     if (exactMatch) {
+      console.log(`Returning exact match: "${exactMatch}"`);
       return exactMatch;
     }
 
     // Simple fallback translation for new text
     // In real implementation, you would call Google Translate API here
+    console.log(`No exact match, using fallback translation for ${targetLanguage}`);
     if (targetLanguage === 'en') {
       // Simple keyword-based translation simulation
       let translatedText = text
@@ -40,7 +45,9 @@ export const translateText = async (text: string, targetLanguage: 'en' | 'cn'): 
         .replace(/процессор/gi, 'processor')
         .replace(/дисплей/gi, 'display');
       
-      return translatedText !== text ? translatedText : `[Auto-EN] ${text}`;
+      const result = translatedText !== text ? translatedText : `[Auto-EN] ${text}`;
+      console.log(`EN translation result: "${result}"`);
+      return result;
     } else if (targetLanguage === 'cn') {
       let translatedText = text
         .replace(/беспроводные наушники/gi, '无线耳机')
@@ -53,9 +60,12 @@ export const translateText = async (text: string, targetLanguage: 'en' | 'cn'): 
         .replace(/процессор/gi, '处理器')
         .replace(/дисплей/gi, '显示屏');
       
-      return translatedText !== text ? translatedText : `[自动中文] ${text}`;
+      const result = translatedText !== text ? translatedText : `[自动中文] ${text}`;
+      console.log(`CN translation result: "${result}"`);
+      return result;
     }
 
+    console.log(`No translation, returning original: "${text}"`);
     return text;
   } catch (error) {
     console.error('Translation failed:', error);
