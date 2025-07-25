@@ -104,6 +104,30 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
     }
   };
 
+  const handleManualTranslate = async () => {
+    if (!valueRu.trim()) return;
+    
+    setIsTranslating(true);
+    
+    try {
+      console.log('Translating text:', valueRu);
+      const translations = await translateDescriptions(valueRu);
+      console.log('Translation results:', translations);
+      
+      // Save English translation
+      onFieldEdit(productId, `${field}En`, translations.en);
+      
+      // Save Chinese translation
+      onFieldEdit(productId, `${field}Cn`, translations.cn);
+      
+      console.log('Translations saved');
+    } catch (error) {
+      console.error('Manual translation failed:', error);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   if (isEditing && viewLanguage === 'ru') {
     return (
       <div className="w-full">
@@ -164,6 +188,27 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
             {lang.label}
           </Button>
         ))}
+        
+        {/* Manual translate button */}
+        {valueRu && !isTranslating && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800"
+            onClick={handleManualTranslate}
+            disabled={!valueRu.trim()}
+          >
+            <Icon name="RotateCcw" size={12} className="mr-1" />
+            Перевести
+          </Button>
+        )}
+        
+        {isTranslating && (
+          <div className="flex items-center gap-1">
+            <Icon name="Loader2" size={12} className="animate-spin" />
+            <span className="text-xs text-gray-500">Переводим...</span>
+          </div>
+        )}
       </div>
       
       <div className="flex items-start justify-between gap-3">

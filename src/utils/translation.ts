@@ -26,10 +26,34 @@ export const translateText = async (text: string, targetLanguage: 'en' | 'cn'): 
     }
 
     // Simple fallback translation for new text
+    // In real implementation, you would call Google Translate API here
     if (targetLanguage === 'en') {
-      return `[EN] ${text}`;
+      // Simple keyword-based translation simulation
+      let translatedText = text
+        .replace(/беспроводные наушники/gi, 'wireless headphones')
+        .replace(/активным шумоподавлением/gi, 'active noise cancellation')
+        .replace(/время работы/gi, 'battery life')
+        .replace(/быстрая зарядка/gi, 'quick charge')
+        .replace(/фитнес-трекер/gi, 'fitness tracker')
+        .replace(/водонепроницаемый/gi, 'waterproof')
+        .replace(/игровой ноутбук/gi, 'gaming laptop')
+        .replace(/процессор/gi, 'processor')
+        .replace(/дисплей/gi, 'display');
+      
+      return translatedText !== text ? translatedText : `[Auto-EN] ${text}`;
     } else if (targetLanguage === 'cn') {
-      return `[中文] ${text}`;
+      let translatedText = text
+        .replace(/беспроводные наушники/gi, '无线耳机')
+        .replace(/активным шумоподавлением/gi, '主动降噪')
+        .replace(/время работы/gi, '续航时间')
+        .replace(/быстрая зарядка/gi, '快速充电')
+        .replace(/фитнес-трекер/gi, '健身追踪器')
+        .replace(/водонепроницаемый/gi, '防水')
+        .replace(/игровой ноутбук/gi, '游戏笔记本')
+        .replace(/процессор/gi, '处理器')
+        .replace(/дисплей/gi, '显示屏');
+      
+      return translatedText !== text ? translatedText : `[自动中文] ${text}`;
     }
 
     return text;

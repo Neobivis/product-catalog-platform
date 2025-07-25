@@ -189,7 +189,11 @@ const Index = () => {
         ? { ...product, [field]: field === 'price' || field === 'quantity' ? Number(value) : value }
         : product
     ));
-    setEditingField(null);
+    
+    // Only close editing field for non-translation fields
+    if (!field.endsWith('En') && !field.endsWith('Cn')) {
+      setEditingField(null);
+    }
   };
 
   const handleImageNavigation = (productId: string, direction: 'prev' | 'next') => {
