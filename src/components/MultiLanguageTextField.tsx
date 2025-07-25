@@ -160,7 +160,6 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
               size="sm"
               className="h-6 w-6 p-0"
               onClick={handleSaveClick}
-              disabled={isTranslating}
               title="Сохранить"
             >
               <Icon name="Check" size={12} className="text-green-600" />
@@ -170,7 +169,6 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
               size="sm"
               className="h-6 w-6 p-0"
               onClick={handleCancel}
-              disabled={isTranslating}
               title="Отменить"
             >
               <Icon name="X" size={12} className="text-red-600" />
