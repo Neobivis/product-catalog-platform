@@ -194,6 +194,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           productId={product.id}
                           field="price"
                           value={product.price}
+                          language={language}
                           editingField={editingField}
                           setEditingField={setEditingField}
                           onFieldEdit={onFieldEdit}

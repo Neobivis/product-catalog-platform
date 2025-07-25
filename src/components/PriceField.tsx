@@ -3,11 +3,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { convertPrice, formatCurrency, PriceDisplay } from '@/utils/currency';
+import { Language } from '@/types/product';
 
 interface PriceFieldProps {
   productId: string;
   field: string;
   value: number;
+  language: Language;
   editingField: {productId: string, field: string} | null;
   setEditingField: (field: {productId: string, field: string} | null) => void;
   onFieldEdit: (productId: string, field: string, value: string | number) => void;
@@ -17,6 +19,7 @@ const PriceField: React.FC<PriceFieldProps> = ({
   productId, 
   field, 
   value, 
+  language,
   editingField,
   setEditingField,
   onFieldEdit
@@ -77,10 +80,14 @@ const PriceField: React.FC<PriceFieldProps> = ({
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium">{formatCurrency(prices.cny, 'CNY')}</span>
-              <span className="text-gray-400">/</span>
-              <span className="text-orange-500 font-medium">{formatCurrency(prices.usd, 'USD')}</span>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-600">{formatCurrency(prices.rub, 'RUB')}</span>
+              {language !== 'cn' && (
+                <>
+                  <span className="text-gray-400">/</span>
+                  <span className="text-orange-500 font-medium">{formatCurrency(prices.usd, 'USD')}</span>
+                  <span className="text-gray-400">/</span>
+                  <span className="text-gray-600">{formatCurrency(prices.rub, 'RUB')}</span>
+                </>
+              )}
             </div>
           </div>
         )}
