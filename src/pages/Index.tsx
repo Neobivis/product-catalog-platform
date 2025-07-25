@@ -24,6 +24,10 @@ interface Product {
   category: string;
   images: string[];
   currentImageIndex: number;
+  tnved?: string;
+  material?: string;
+  purpose?: string;
+  forWhom?: string;
 }
 
 interface Category {
@@ -78,7 +82,11 @@ const translations = {
     currentImages: 'Текущие изображения',
     main: 'Главное',
     inDevelopment: 'Раздел в разработке',
-    functionalityWillBeAdded: 'будет добавлен в следующих версиях'
+    functionalityWillBeAdded: 'будет добавлен в следующих версиях',
+    tnved: 'ТН ВЭД',
+    material: 'Материал',
+    purpose: 'Предназначение',
+    forWhom: 'Для кого'
   },
   cn: {
     title: '产品目录',
@@ -147,7 +155,11 @@ const Index = () => {
       webLink: 'https://example.com/headphones',
       category: 'Electronics/Audio',
       images: ['/img/cf9d4e6b-0b84-40fa-8944-4ddf188a111f.jpg', '/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
-      currentImageIndex: 0
+      currentImageIndex: 0,
+      tnved: '8518210000',
+      material: 'Пластик, металл',
+      purpose: 'Прослушивание музыки',
+      forWhom: 'Взрослые'
     },
     {
       id: '2',
@@ -161,7 +173,11 @@ const Index = () => {
       webLink: 'https://example.com/tracker',
       category: 'Electronics/Wearables',
       images: ['/img/c817e33c-f23e-46f9-8803-0e914e9017bd.jpg', '/img/cf9d4e6b-0b84-40fa-8944-4ddf188a111f.jpg'],
-      currentImageIndex: 0
+      currentImageIndex: 0,
+      tnved: '8517120000',
+      material: 'Силикон, пластик',
+      purpose: 'Фитнес-трекинг',
+      forWhom: 'Спортсмены'
     },
     {
       id: '3',
@@ -175,7 +191,65 @@ const Index = () => {
       webLink: 'https://example.com/laptop',
       category: 'Electronics/Computers',
       images: ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
-      currentImageIndex: 0
+      currentImageIndex: 0,
+      tnved: '8471300000',
+      material: 'Алюминий, пластик',
+      purpose: 'Игры и работа',
+      forWhom: 'Геймеры'
+    },
+    {
+      id: '4',
+      nameEn: 'Wireless Mouse',
+      nameCn: '无线鼠标',
+      nameRu: 'Беспроводная компьютерная мышь',
+      price: 89.99,
+      sku: 'WM-2024-RGB',
+      quantity: 156,
+      brand: 'TechMouse',
+      webLink: 'https://example.com/mouse',
+      category: 'Electronics/Computers',
+      images: ['/img/c817e33c-f23e-46f9-8803-0e914e9017bd.jpg'],
+      currentImageIndex: 0,
+      tnved: '8471609000',
+      material: 'Пластик, резина',
+      purpose: 'Управление компьютером',
+      forWhom: 'Пользователи ПК'
+    },
+    {
+      id: '5',
+      nameEn: 'Cotton T-Shirt',
+      nameCn: '棉质T恤',
+      nameRu: 'Хлопчатобумажная футболка',
+      price: 29.99,
+      sku: 'CT-2024-BLU',
+      quantity: 89,
+      brand: 'ComfortWear',
+      webLink: 'https://example.com/tshirt',
+      category: 'Clothing/Shirts',
+      images: ['/img/cf9d4e6b-0b84-40fa-8944-4ddf188a111f.jpg'],
+      currentImageIndex: 0,
+      tnved: '6109100000',
+      material: '100% хлопок',
+      purpose: 'Повседневная одежда',
+      forWhom: 'Взрослые, унисекс'
+    },
+    {
+      id: '6',
+      nameEn: 'Kitchen Knife Set',
+      nameCn: '厨房刀具套装',
+      nameRu: 'Набор кухонных ножей',
+      price: 199.99,
+      sku: 'KS-2024-PRO',
+      quantity: 34,
+      brand: 'ChefPro',
+      webLink: 'https://example.com/knives',
+      category: 'Home & Garden',
+      images: ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
+      currentImageIndex: 0,
+      tnved: '8211920000',
+      material: 'Нержавеющая сталь, дерево',
+      purpose: 'Приготовление пищи',
+      forWhom: 'Повара, кулинары'
     }
   ]);
 
@@ -247,7 +321,11 @@ const Index = () => {
     webLink: '',
     category: '',
     images: ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
-    currentImageIndex: 0
+    currentImageIndex: 0,
+    tnved: '',
+    material: '',
+    purpose: '',
+    forWhom: ''
   });
 
   // Get unique brands and categories
@@ -320,6 +398,101 @@ const Index = () => {
 
   const handleAddProduct = () => {
     if (newProduct.nameEn && newProduct.sku) {
+      // Auto-generate Russian fields based on category and product type
+      const getRussianFields = (category: string, nameEn: string) => {
+        const categoryLower = category.toLowerCase();
+        const nameLower = nameEn.toLowerCase();
+        
+        // Default ТН ВЭД codes and materials based on category
+        if (categoryLower.includes('electronics')) {
+          if (nameLower.includes('headphone') || nameLower.includes('audio')) {
+            return {
+              tnved: '8518210000',
+              material: 'Пластик, металл',
+              purpose: 'Прослушивание музыки',
+              forWhom: 'Взрослые'
+            };
+          } else if (nameLower.includes('computer') || nameLower.includes('laptop')) {
+            return {
+              tnved: '8471300000',
+              material: 'Алюминий, пластик',
+              purpose: 'Вычислительные операции',
+              forWhom: 'Пользователи ПК'
+            };
+          } else if (nameLower.includes('mouse')) {
+            return {
+              tnved: '8471609000',
+              material: 'Пластик, резина',
+              purpose: 'Управление компьютером',
+              forWhom: 'Пользователи ПК'
+            };
+          } else if (nameLower.includes('tracker') || nameLower.includes('wearable')) {
+            return {
+              tnved: '8517120000',
+              material: 'Силикон, пластик',
+              purpose: 'Фитнес-трекинг',
+              forWhom: 'Спортсмены'
+            };
+          } else {
+            return {
+              tnved: '8517620000',
+              material: 'Пластик, металл',
+              purpose: 'Электронное устройство',
+              forWhom: 'Взрослые'
+            };
+          }
+        } else if (categoryLower.includes('clothing')) {
+          if (nameLower.includes('shirt') || nameLower.includes('t-shirt')) {
+            return {
+              tnved: '6109100000',
+              material: '100% хлопок',
+              purpose: 'Повседневная одежда',
+              forWhom: 'Взрослые, унисекс'
+            };
+          } else if (nameLower.includes('pants') || nameLower.includes('trousers')) {
+            return {
+              tnved: '6203120000',
+              material: 'Хлопок, полиэстер',
+              purpose: 'Повседневная одежда',
+              forWhom: 'Взрослые'
+            };
+          } else {
+            return {
+              tnved: '6109900000',
+              material: 'Текстиль',
+              purpose: 'Одежда',
+              forWhom: 'Взрослые'
+            };
+          }
+        } else if (categoryLower.includes('home')) {
+          if (nameLower.includes('knife') || nameLower.includes('kitchen')) {
+            return {
+              tnved: '8211920000',
+              material: 'Нержавеющая сталь',
+              purpose: 'Приготовление пищи',
+              forWhom: 'Повара, кулинары'
+            };
+          } else {
+            return {
+              tnved: '3924100000',
+              material: 'Пластик, дерево',
+              purpose: 'Бытовое использование',
+              forWhom: 'Домохозяйства'
+            };
+          }
+        }
+        
+        // Default fallback
+        return {
+          tnved: '9999999999',
+          material: 'Смешанные материалы',
+          purpose: 'Общее назначение',
+          forWhom: 'Взрослые'
+        };
+      };
+      
+      const autoRussianFields = getRussianFields(newProduct.category || '', newProduct.nameEn || '');
+      
       const product: Product = {
         id: Date.now().toString(),
         nameEn: newProduct.nameEn || '',
@@ -332,7 +505,11 @@ const Index = () => {
         webLink: newProduct.webLink || '',
         category: newProduct.category || '',
         images: newProduct.images || ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
-        currentImageIndex: 0
+        currentImageIndex: 0,
+        tnved: newProduct.tnved || autoRussianFields.tnved,
+        material: newProduct.material || autoRussianFields.material,
+        purpose: newProduct.purpose || autoRussianFields.purpose,
+        forWhom: newProduct.forWhom || autoRussianFields.forWhom
       };
       setProducts(prev => [...prev, product]);
       setNewProduct({
@@ -346,7 +523,11 @@ const Index = () => {
         webLink: '',
         category: '',
         images: ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
-        currentImageIndex: 0
+        currentImageIndex: 0,
+        tnved: '',
+        material: '',
+        purpose: '',
+        forWhom: ''
       });
       setShowAddForm(false);
     }
@@ -736,6 +917,49 @@ const Index = () => {
                     </div>
                   </div>
 
+                  {/* Russian fields section */}
+                  <div className="border-t pt-4 mt-4">
+                    <h4 className="font-semibold text-sm text-gray-700 mb-3">Российские сертификаты</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="tnved">{t.tnved}</Label>
+                        <Input
+                          id="tnved"
+                          value={newProduct.tnved || ''}
+                          onChange={(e) => setNewProduct(prev => ({...prev, tnved: e.target.value}))}
+                          placeholder="8471300000"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="material">{t.material}</Label>
+                        <Input
+                          id="material"
+                          value={newProduct.material || ''}
+                          onChange={(e) => setNewProduct(prev => ({...prev, material: e.target.value}))}
+                          placeholder="Пластик, металл"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="purpose">{t.purpose}</Label>
+                        <Input
+                          id="purpose"
+                          value={newProduct.purpose || ''}
+                          onChange={(e) => setNewProduct(prev => ({...prev, purpose: e.target.value}))}
+                          placeholder="Предназначение товара"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="forWhom">{t.forWhom}</Label>
+                        <Input
+                          id="forWhom"
+                          value={newProduct.forWhom || ''}
+                          onChange={(e) => setNewProduct(prev => ({...prev, forWhom: e.target.value}))}
+                          placeholder="Взрослые"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline" onClick={() => setShowAddForm(false)}>
                       {t.cancel}
@@ -1037,6 +1261,39 @@ const Index = () => {
                               <div className="font-semibold">{product.category}</div>
                             </div>
                           </div>
+
+                          {/* Russian-specific fields */}
+                          {language === 'ru' && (
+                            <div className="border-t pt-4 mt-4">
+                              <h4 className="font-semibold text-sm text-gray-700 mb-3">Российские сертификаты</h4>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {product.tnved && (
+                                  <div>
+                                    <span className="text-xs text-gray-500">{t.tnved}</span>
+                                    <div className="font-semibold">{product.tnved}</div>
+                                  </div>
+                                )}
+                                {product.material && (
+                                  <div>
+                                    <span className="text-xs text-gray-500">{t.material}</span>
+                                    <div className="font-semibold">{product.material}</div>
+                                  </div>
+                                )}
+                                {product.purpose && (
+                                  <div>
+                                    <span className="text-xs text-gray-500">{t.purpose}</span>
+                                    <div className="font-semibold">{product.purpose}</div>
+                                  </div>
+                                )}
+                                {product.forWhom && (
+                                  <div>
+                                    <span className="text-xs text-gray-500">{t.forWhom}</span>
+                                    <div className="font-semibold">{product.forWhom}</div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </CardContent>
@@ -1262,6 +1519,62 @@ const Index = () => {
                           </div>
                         </div>
                       </div>
+
+                      {/* Russian-specific fields */}
+                      {language === 'ru' && (
+                        <div className="border-t pt-4 mt-4">
+                          <h4 className="font-semibold text-sm text-gray-700 mb-3">Российские сертификаты</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                                <span className="font-semibold text-sm w-20">{t.tnved}</span>
+                                <div className="flex-1">
+                                  <EditableField
+                                    productId={product.id}
+                                    field="tnved"
+                                    value={product.tnved || ''}
+                                  />
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                                <span className="font-semibold text-sm w-20">{t.material}</span>
+                                <div className="flex-1">
+                                  <EditableField
+                                    productId={product.id}
+                                    field="material"
+                                    value={product.material || ''}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                                <span className="font-semibold text-sm w-20">{t.purpose}</span>
+                                <div className="flex-1">
+                                  <EditableField
+                                    productId={product.id}
+                                    field="purpose"
+                                    value={product.purpose || ''}
+                                  />
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
+                                <span className="font-semibold text-sm w-20">{t.forWhom}</span>
+                                <div className="flex-1">
+                                  <EditableField
+                                    productId={product.id}
+                                    field="forWhom"
+                                    value={product.forWhom || ''}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
