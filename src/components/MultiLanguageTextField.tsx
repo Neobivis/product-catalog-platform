@@ -33,6 +33,7 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
   const [viewLanguage, setViewLanguage] = useState<'ru' | 'en' | 'cn'>('ru');
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [textValue, setTextValue] = useState(valueRu);
   const isEditing = editingField?.productId === productId && editingField?.field === field;
 
   // Get available view languages based on current site language
@@ -80,18 +81,26 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
     setIsTranslating(true);
     
     try {
+      console.log('Saving text:', { productId, field, newRuText });
+      
       // Save Russian text immediately
       onFieldEdit(productId, field, newRuText);
       
       // Auto-translate to other languages
       if (newRuText.trim()) {
+        console.log('Starting translation for:', newRuText);
         const translations = await translateDescriptions(newRuText);
+        console.log('Translation results:', translations);
         
         // Save English translation
+        console.log('Saving English:', { productId, field: `${field}En`, value: translations.en });
         onFieldEdit(productId, `${field}En`, translations.en);
         
         // Save Chinese translation
+        console.log('Saving Chinese:', { productId, field: `${field}Cn`, value: translations.cn });
         onFieldEdit(productId, `${field}Cn`, translations.cn);
+        
+        console.log('Translations saved successfully');
       } else {
         // Clear translations if Russian text is empty
         onFieldEdit(productId, `${field}En`, '');
@@ -128,7 +137,24 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
     }
   };
 
+  // Update textValue when valueRu changes or editing starts
+  React.useEffect(() => {
+    if (isEditing) {
+      setTextValue(valueRu);
+    }
+  }, [isEditing, valueRu]);
+
+  const handleSaveClick = () => {
+    handleSave(textValue);
+    setEditingField(null);
+  };
+
+  const handleCancel = () => {
+    setEditingField(null);
+  };
+
   if (isEditing && viewLanguage === 'ru') {
+
     return (
       <div className="w-full">
         <div className="flex items-center gap-2 mb-3">
@@ -152,21 +178,48 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
           )}
         </div>
         
-        <Textarea
-          defaultValue={valueRu}
-          placeholder={placeholder}
-          className="min-h-[120px] text-sm resize-none"
-          autoFocus
-          onBlur={(e) => handleSave(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setEditingField(null);
-            }
-            if (e.key === 'Enter' && e.ctrlKey) {
-              handleSave(e.currentTarget.value);
-            }
-          }}
-        />
+        <div className="relative">
+          <Textarea
+            value={textValue}
+            onChange={(e) => setTextValue(e.target.value)}
+            placeholder={placeholder}
+            className="min-h-[120px] text-sm resize-none pr-20"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                handleCancel();
+              }
+              if (e.key === 'Enter' && e.ctrlKey) {
+                handleSaveClick();
+              }
+            }}
+          />
+          
+          {/* Save and Cancel buttons */}
+          <div className="absolute top-2 right-2 flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={handleSaveClick}
+              disabled={isTranslating}
+              title="Сохранить"
+            >
+              <Icon name="Check" size={12} className="text-green-600" />
+            </Button>
+            <Button
+              variant="ghost" 
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={handleCancel}
+              disabled={isTranslating}
+              title="Отменить"
+            >
+              <Icon name="X" size={12} className="text-red-600" />
+            </Button>
+          </div>
+        </div>
+        
         <div className="text-xs text-gray-500 mt-1">
           Ctrl+Enter для сохранения, Escape для отмены. Автоматический перевод на EN/CN после сохранения.
         </div>
