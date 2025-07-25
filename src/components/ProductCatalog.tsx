@@ -282,9 +282,9 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                     <h4 className="font-semibold text-sm text-gray-700 mb-3">Российские сертификаты</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                          <span className="font-semibold text-sm w-20">{t.tnved}</span>
-                          <div className="flex-1">
+                        <div className="flex items-start gap-3 p-3 bg-white border rounded-lg">
+                          <span className="font-semibold text-sm w-32 flex-shrink-0">{t.tnved}</span>
+                          <div className="flex-1 min-w-0">
                             <EditableField
                               productId={product.id}
                               field="tnved"
@@ -296,9 +296,9 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                          <span className="font-semibold text-sm w-20">{t.material}</span>
-                          <div className="flex-1">
+                        <div className="flex items-start gap-3 p-3 bg-white border rounded-lg">
+                          <span className="font-semibold text-sm w-32 flex-shrink-0">{t.material}</span>
+                          <div className="flex-1 min-w-0">
                             <EditableField
                               productId={product.id}
                               field="material"
@@ -312,9 +312,9 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                       </div>
                       
                       <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                          <span className="font-semibold text-sm w-20">{t.purpose}</span>
-                          <div className="flex-1">
+                        <div className="flex items-start gap-3 p-3 bg-white border rounded-lg">
+                          <span className="font-semibold text-sm w-32 flex-shrink-0">{t.purpose}</span>
+                          <div className="flex-1 min-w-0">
                             <EditableField
                               productId={product.id}
                               field="purpose"
@@ -326,8 +326,8 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                          <span className="font-semibold text-sm w-20">{t.forWhom}</span>
+                        <div className="flex items-start gap-3 p-3 bg-white border rounded-lg">
+                          <span className="font-semibold text-sm w-32 flex-shrink-0">{t.forWhom}</span>
                           <div className="flex-1">
                             <EditableField
                               productId={product.id}
