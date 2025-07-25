@@ -280,7 +280,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                 {/* Russian-specific fields */}
                 {language === 'ru' && (
                   <div className="border-t pt-4 mt-4">
-                    <h4 className="font-semibold text-sm text-gray-700 mb-3">Российские сертификаты</h4>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-3">
                         <div className="flex items-start gap-3 p-3 bg-white border rounded-lg">
