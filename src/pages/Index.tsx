@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 
 interface Product {
@@ -110,6 +111,10 @@ const Index = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<{min: number, max: number}>({min: 0, max: 2000});
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showImageManager, setShowImageManager] = useState<string | null>(null);
+  const [newImageUrl, setNewImageUrl] = useState('');
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
     nameEn: '',
     nameCn: '',
@@ -226,6 +231,62 @@ const Index = () => {
     }
   };
 
+  // Image management functions
+  const handleFileUpload = (productId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        if (result) {
+          addImageToProduct(productId, result);
+        }
+      };
+      
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addImageToProduct = (productId: string, imageUrl: string) => {
+    setProducts(prev => prev.map(product => 
+      product.id === productId 
+        ? { ...product, images: [...product.images, imageUrl] }
+        : product
+    ));
+  };
+
+  const removeImageFromProduct = (productId: string, imageIndex: number) => {
+    setProducts(prev => prev.map(product => {
+      if (product.id === productId) {
+        const newImages = product.images.filter((_, index) => index !== imageIndex);
+        // Ensure at least one image remains
+        if (newImages.length === 0) {
+          newImages.push('/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg');
+        }
+        // Adjust current image index if necessary
+        const newCurrentIndex = product.currentImageIndex >= newImages.length 
+          ? Math.max(0, newImages.length - 1)
+          : product.currentImageIndex;
+        
+        return { 
+          ...product, 
+          images: newImages,
+          currentImageIndex: newCurrentIndex
+        };
+      }
+      return product;
+    }));
+  };
+
+  const addImageByUrl = (productId: string) => {
+    if (newImageUrl.trim()) {
+      addImageToProduct(productId, newImageUrl.trim());
+      setNewImageUrl('');
+    }
+  };
+
   const toggleBrandFilter = (brand: string) => {
     setSelectedBrands(prev => 
       prev.includes(brand) 
@@ -311,6 +372,124 @@ const Index = () => {
       ))}
     </div>
   );
+
+  const ImageManager = ({ productId }: { productId: string }) => {
+    const product = products.find(p => p.id === productId);
+    if (!product) return null;
+
+    return (
+      <Dialog open={showImageManager === productId} onOpenChange={() => setShowImageManager(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Управление изображениями - {product.nameEn}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Add Images Section */}
+            <div className="space-y-4">
+              <h4 className="font-semibold">Добавить изображения</h4>
+              
+              <Tabs defaultValue="upload" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="upload">Загрузить файл</TabsTrigger>
+                  <TabsTrigger value="url">По ссылке</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="upload" className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(productId, e)}
+                      className="hidden"
+                    />
+                    <Icon name="Upload" size={48} className="mx-auto mb-4 text-gray-400" />
+                    <p className="text-gray-600 mb-4">Перетащите изображение сюда или нажмите для выбора</p>
+                    <Button 
+                      onClick={() => fileInputRef.current?.click()}
+                      variant="outline"
+                    >
+                      Выбрать файл
+                    </Button>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="url" className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="https://example.com/image.jpg"
+                      value={newImageUrl}
+                      onChange={(e) => setNewImageUrl(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button onClick={() => addImageByUrl(productId)}>
+                      <Icon name="Plus" size={16} />
+                      Добавить
+                    </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+
+            {/* Current Images */}
+            <div className="space-y-4">
+              <h4 className="font-semibold">Текущие изображения ({product.images.length})</h4>
+              
+              <div className="grid grid-cols-3 gap-4">
+                {product.images.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <div className={`aspect-square rounded-lg overflow-hidden border-2 ${
+                      index === product.currentImageIndex ? 'border-blue-500' : 'border-gray-200'
+                    }`}>
+                      <img
+                        src={image}
+                        alt={`${product.nameEn} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    
+                    {/* Image Controls */}
+                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => setProducts(prev => prev.map(p => 
+                          p.id === productId 
+                            ? { ...p, currentImageIndex: index }
+                            : p
+                        ))}
+                        disabled={index === product.currentImageIndex}
+                      >
+                        <Icon name="Eye" size={14} />
+                      </Button>
+                      
+                      {product.images.length > 1 && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => removeImageFromProduct(productId, index)}
+                        >
+                          <Icon name="Trash2" size={14} />
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {/* Main Image Badge */}
+                    {index === product.currentImageIndex && (
+                      <Badge className="absolute top-2 left-2">
+                        Главное
+                      </Badge>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -763,15 +942,25 @@ const Index = () => {
                               </Button>
                             </>
                           )}
+                          
+                          {/* Image Management Button */}
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="absolute bottom-2 right-2 h-8 w-8 p-0"
+                            onClick={() => setShowImageManager(product.id)}
+                          >
+                            <Icon name="ImagePlus" size={16} />
+                          </Button>
                         </div>
                         
                         {/* Thumbnails */}
                         {product.images.length > 1 && (
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 overflow-x-auto">
                             {product.images.map((image, index) => (
                               <button
                                 key={index}
-                                className={`w-16 h-16 rounded border-2 overflow-hidden ${
+                                className={`flex-shrink-0 w-16 h-16 rounded border-2 overflow-hidden ${
                                   index === product.currentImageIndex 
                                     ? 'border-blue-500' 
                                     : 'border-gray-200'
@@ -790,6 +979,12 @@ const Index = () => {
                               </button>
                             ))}
                           </div>
+                        )}
+                        
+                        {/* Image Count Badge */}
+                        <Badge variant="outline" className="text-xs">
+                          {product.images.length} фото
+                        </Badge>
                         )}
                       </div>
                     </div>
@@ -931,6 +1126,11 @@ const Index = () => {
             <p className="text-gray-500">Функционал "{activeTab}" будет добавлен в следующих версиях</p>
           </div>
         )}
+
+        {/* Image Managers for all products */}
+        {products.map(product => (
+          <ImageManager key={`manager-${product.id}`} productId={product.id} />
+        ))}
       </main>
     </div>
   );
