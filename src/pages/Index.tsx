@@ -60,6 +60,12 @@ const translations = {
     brand: 'Бренд',
     category: 'Категория',
     webLink: 'Веб-ссылка',
+    priceField: 'Цена',
+    skuField: 'SKU',
+    quantityField: 'Количество',
+    brandField: 'Бренд',
+    categoryField: 'Категория',
+    webLinkField: 'Веб-ссылка',
     cancel: 'Отмена',
     add: 'Добавить',
     photos: 'фото',
@@ -100,6 +106,12 @@ const translations = {
     brand: '品牌',
     category: '类别',
     webLink: '网站链接',
+    priceField: '价格',
+    skuField: 'SKU',
+    quantityField: '数量',
+    brandField: '品牌',
+    categoryField: '类别',
+    webLinkField: '网站链接',
     cancel: '取消',
     add: '添加',
     photos: '张照片',
@@ -1020,10 +1032,10 @@ const Index = () => {
             {products.map(product => (
               <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <div className="grid grid-cols-12 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     
                     {/* Product Images */}
-                    <div className="col-span-3">
+                    <div className="order-1 lg:order-1 col-span-1 lg:col-span-3">
                       <div className="space-y-4">
                         {/* Main Image */}
                         <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
@@ -1099,13 +1111,12 @@ const Index = () => {
                     </div>
 
                     {/* Product Details */}
-                    <div className="col-span-9 space-y-4">
+                    <div className="order-2 lg:order-2 col-span-1 lg:col-span-9 space-y-4">
                       
                       {/* Multi-language Names */}
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2 w-16">
-                            <span className="font-semibold text-sm">EN</span>
                             <span className="text-lg">🇺🇸</span>
                           </div>
                           <div className="flex-1">
@@ -1119,7 +1130,6 @@ const Index = () => {
                         
                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2 w-16">
-                            <span className="font-semibold text-sm">CN</span>
                             <span className="text-lg">🇨🇳</span>
                           </div>
                           <div className="flex-1">
@@ -1133,7 +1143,6 @@ const Index = () => {
                         
                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2 w-16">
-                            <span className="font-semibold text-sm">RU</span>
                             <span className="text-lg">🇷🇺</span>
                           </div>
                           <div className="flex-1">
@@ -1150,7 +1159,7 @@ const Index = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-3">
                           <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                            <span className="font-semibold text-sm w-20">Price</span>
+                            <span className="font-semibold text-sm w-20">{t.priceField}</span>
                             <div className="flex-1">
                               <EditableField
                                 productId={product.id}
@@ -1162,7 +1171,7 @@ const Index = () => {
                           </div>
                           
                           <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                            <span className="font-semibold text-sm w-20">SKU</span>
+                            <span className="font-semibold text-sm w-20">{t.skuField}</span>
                             <div className="flex-1">
                               <EditableField
                                 productId={product.id}
@@ -1173,7 +1182,7 @@ const Index = () => {
                           </div>
                           
                           <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                            <span className="font-semibold text-sm w-20">Quantity</span>
+                            <span className="font-semibold text-sm w-20">{t.quantityField}</span>
                             <div className="flex-1">
                               <EditableField
                                 productId={product.id}
@@ -1187,7 +1196,7 @@ const Index = () => {
                         
                         <div className="space-y-3">
                           <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                            <span className="font-semibold text-sm w-20">Brand</span>
+                            <span className="font-semibold text-sm w-20">{t.brandField}</span>
                             <div className="flex-1">
                               <EditableField
                                 productId={product.id}
@@ -1198,7 +1207,7 @@ const Index = () => {
                           </div>
                           
                           <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                            <span className="font-semibold text-sm w-20">Web Link</span>
+                            <span className="font-semibold text-sm w-20">{t.webLinkField}</span>
                             <div className="flex-1">
                               <EditableField
                                 productId={product.id}
@@ -1209,7 +1218,7 @@ const Index = () => {
                           </div>
                           
                           <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                            <span className="font-semibold text-sm w-20">Category</span>
+                            <span className="font-semibold text-sm w-20">{t.categoryField}</span>
                             <div className="flex-1">
                               <EditableField
                                 productId={product.id}
