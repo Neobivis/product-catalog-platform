@@ -54,6 +54,19 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
   const availableLanguages = getAvailableLanguages();
   const currentValue = availableLanguages.find(lang => lang.code === viewLanguage)?.value || '';
 
+  // Debug current values
+  React.useEffect(() => {
+    console.log('MultiLanguageTextField props updated:', {
+      productId,
+      field,
+      valueRu,
+      valueEn,
+      valueCn,
+      viewLanguage,
+      currentValue
+    });
+  }, [productId, field, valueRu, valueEn, valueCn, viewLanguage, currentValue]);
+
   // Ensure viewLanguage is available
   React.useEffect(() => {
     const isCurrentLangAvailable = availableLanguages.some(lang => lang.code === viewLanguage);

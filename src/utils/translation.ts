@@ -35,6 +35,9 @@ export const translateText = async (text: string, targetLanguage: 'en' | 'cn'): 
     if (targetLanguage === 'en') {
       // Simple keyword-based translation simulation
       let translatedText = text
+        .replace(/хорошие наушники/gi, 'good headphones')
+        .replace(/хороший/gi, 'good')
+        .replace(/наушники/gi, 'headphones')
         .replace(/беспроводные наушники/gi, 'wireless headphones')
         .replace(/активным шумоподавлением/gi, 'active noise cancellation')
         .replace(/время работы/gi, 'battery life')
@@ -50,6 +53,9 @@ export const translateText = async (text: string, targetLanguage: 'en' | 'cn'): 
       return result;
     } else if (targetLanguage === 'cn') {
       let translatedText = text
+        .replace(/хорошие наушники/gi, '好耳机')
+        .replace(/хороший/gi, '好')
+        .replace(/наушники/gi, '耳机')
         .replace(/беспроводные наушники/gi, '无线耳机')
         .replace(/активным шумоподавлением/gi, '主动降噪')
         .replace(/время работы/gi, '续航时间')
