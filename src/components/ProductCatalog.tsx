@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import EditableField from '@/components/EditableField';
 import PriceField from '@/components/PriceField';
-import ExpandableTextField from '@/components/ExpandableTextField';
+import MultiLanguageTextField from '@/components/MultiLanguageTextField';
 import { Product, Language } from '@/types/product';
 
 interface ProductCatalogProps {
@@ -188,10 +188,13 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                 {/* Description Section */}
                 <div className="p-4 bg-gray-50 border rounded-lg">
                   <h4 className="font-semibold text-sm text-gray-700 mb-3">{t.description}</h4>
-                  <ExpandableTextField
+                  <MultiLanguageTextField
                     productId={product.id}
                     field="description"
-                    value={product.description || ''}
+                    valueRu={product.description || ''}
+                    valueEn={product.descriptionEn || ''}
+                    valueCn={product.descriptionCn || ''}
+                    language={language}
                     placeholder="Добавить описание товара, ответы на частые вопросы..."
                     editingField={editingField}
                     setEditingField={setEditingField}

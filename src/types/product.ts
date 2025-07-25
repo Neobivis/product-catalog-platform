@@ -12,6 +12,8 @@ export interface Product {
   images: string[];
   currentImageIndex: number;
   description?: string;
+  descriptionEn?: string;
+  descriptionCn?: string;
   tnved?: string;
   material?: string;
   purpose?: string;
