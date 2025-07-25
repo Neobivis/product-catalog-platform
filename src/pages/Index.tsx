@@ -985,7 +985,6 @@ const Index = () => {
                         <Badge variant="outline" className="text-xs">
                           {product.images.length} фото
                         </Badge>
-                        )}
                       </div>
                     </div>
 
