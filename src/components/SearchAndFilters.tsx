@@ -187,7 +187,6 @@ const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                     {/* Russian-specific fields */}
                     {language === 'ru' && (
                       <div className="border-t pt-4 mt-4">
-                        <h4 className="font-semibold text-sm text-gray-700 mb-3">Российские сертификаты</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {product.tnved && (
                             <div>
