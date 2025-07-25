@@ -32,7 +32,95 @@ interface Category {
   children?: Category[];
 }
 
+// Language translations
+const translations = {
+  ru: {
+    title: 'Каталог товаров',
+    addProduct: 'Добавить товар',
+    catalog: 'Каталог',
+    search: 'Поиск',
+    filters: 'Фильтры',
+    favorites: 'Избранное',
+    admin: 'Админка',
+    searchPlaceholder: 'Поиск по названию, SKU, бренду, категории...',
+    found: 'Найдено',
+    products: 'товаров',
+    categories: 'Категории',
+    brands: 'Бренды',
+    price: 'Цена',
+    from: 'От',
+    to: 'До',
+    shown: 'Показано',
+    addNewProduct: 'Добавить новый товар',
+    nameEn: 'Название (EN)',
+    nameCn: 'Название (CN)',
+    nameRu: 'Название (RU)',
+    sku: 'SKU',
+    quantity: 'Количество',
+    brand: 'Бренд',
+    category: 'Категория',
+    webLink: 'Веб-ссылка',
+    cancel: 'Отмена',
+    add: 'Добавить',
+    photos: 'фото',
+    imageManagement: 'Управление изображениями',
+    addImages: 'Добавить изображения',
+    uploadFile: 'Загрузить файл',
+    byLink: 'По ссылке',
+    dragDrop: 'Перетащите изображение сюда или нажмите для выбора',
+    selectFile: 'Выбрать файл',
+    currentImages: 'Текущие изображения',
+    main: 'Главное',
+    inDevelopment: 'Раздел в разработке',
+    functionalityWillBeAdded: 'будет добавлен в следующих версиях'
+  },
+  cn: {
+    title: '产品目录',
+    addProduct: '添加产品',
+    catalog: '目录',
+    search: '搜索',
+    filters: '筛选',
+    favorites: '收藏',
+    admin: '管理',
+    searchPlaceholder: '按名称、SKU、品牌、类别搜索...',
+    found: '找到',
+    products: '产品',
+    categories: '类别',
+    brands: '品牌',
+    price: '价格',
+    from: '从',
+    to: '到',
+    shown: '显示',
+    addNewProduct: '添加新产品',
+    nameEn: '名称 (英文)',
+    nameCn: '名称 (中文)',
+    nameRu: '名称 (俄文)',
+    sku: 'SKU',
+    quantity: '数量',
+    brand: '品牌',
+    category: '类别',
+    webLink: '网站链接',
+    cancel: '取消',
+    add: '添加',
+    photos: '张照片',
+    imageManagement: '图片管理',
+    addImages: '添加图片',
+    uploadFile: '上传文件',
+    byLink: '通过链接',
+    dragDrop: '将图片拖到这里或点击选择',
+    selectFile: '选择文件',
+    currentImages: '当前图片',
+    main: '主要',
+    inDevelopment: '功能开发中',
+    functionalityWillBeAdded: '将在后续版本中添加'
+  }
+};
+
+type Language = 'ru' | 'cn';
+
 const Index = () => {
+  const [language, setLanguage] = useState<Language>('ru');
+  const t = translations[language];
   // Sample data with more products
   const [products, setProducts] = useState<Product[]>([
     {
@@ -115,6 +203,27 @@ const Index = () => {
   const [newImageUrl, setNewImageUrl] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const LanguageToggle = () => (
+    <div className="flex items-center gap-2">
+      <Button
+        variant={language === 'ru' ? 'default' : 'outline'}
+        size="sm"
+        onClick={() => setLanguage('ru')}
+        className="flex items-center gap-1"
+      >
+        🇷🇺 RU
+      </Button>
+      <Button
+        variant={language === 'cn' ? 'default' : 'outline'}
+        size="sm"
+        onClick={() => setLanguage('cn')}
+        className="flex items-center gap-1"
+      >
+        🇨🇳 CN
+      </Button>
+    </div>
+  );
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
     nameEn: '',
     nameCn: '',
@@ -381,18 +490,18 @@ const Index = () => {
       <Dialog open={showImageManager === productId} onOpenChange={() => setShowImageManager(null)}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Управление изображениями - {product.nameEn}</DialogTitle>
+            <DialogTitle>{t.imageManagement} - {product.nameEn}</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-6">
             {/* Add Images Section */}
             <div className="space-y-4">
-              <h4 className="font-semibold">Добавить изображения</h4>
+              <h4 className="font-semibold">{t.addImages}</h4>
               
               <Tabs defaultValue="upload" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="upload">Загрузить файл</TabsTrigger>
-                  <TabsTrigger value="url">По ссылке</TabsTrigger>
+                  <TabsTrigger value="upload">{t.uploadFile}</TabsTrigger>
+                  <TabsTrigger value="url">{t.byLink}</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="upload" className="space-y-4">
@@ -405,12 +514,12 @@ const Index = () => {
                       className="hidden"
                     />
                     <Icon name="Upload" size={48} className="mx-auto mb-4 text-gray-400" />
-                    <p className="text-gray-600 mb-4">Перетащите изображение сюда или нажмите для выбора</p>
+                    <p className="text-gray-600 mb-4">{t.dragDrop}</p>
                     <Button 
                       onClick={() => fileInputRef.current?.click()}
                       variant="outline"
                     >
-                      Выбрать файл
+                      {t.selectFile}
                     </Button>
                   </div>
                 </TabsContent>
@@ -425,7 +534,7 @@ const Index = () => {
                     />
                     <Button onClick={() => addImageByUrl(productId)}>
                       <Icon name="Plus" size={16} />
-                      Добавить
+                      {t.add}
                     </Button>
                   </div>
                 </TabsContent>
@@ -434,9 +543,9 @@ const Index = () => {
 
             {/* Current Images */}
             <div className="space-y-4">
-              <h4 className="font-semibold">Текущие изображения ({product.images.length})</h4>
+              <h4 className="font-semibold">{t.currentImages} ({product.images.length})</h4>
               
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {product.images.map((image, index) => (
                   <div key={index} className="relative group">
                     <div className={`aspect-square rounded-lg overflow-hidden border-2 ${
@@ -478,7 +587,7 @@ const Index = () => {
                     {/* Main Image Badge */}
                     {index === product.currentImageIndex && (
                       <Badge className="absolute top-2 left-2">
-                        Главное
+                        {t.main}
                       </Badge>
                     )}
                   </div>
@@ -494,26 +603,27 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">Каталог товаров</h1>
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-4">
+            <h1 className="text-xl lg:text-2xl font-bold text-gray-900">{t.title}</h1>
+            <LanguageToggle />
             
             <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
               <DialogTrigger asChild>
                 <Button className="flex items-center gap-2">
                   <Icon name="Plus" size={16} />
-                  Добавить товар
+                  {t.addProduct}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Добавить новый товар</DialogTitle>
+                  <DialogTitle>{t.addNewProduct}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="nameEn">Название (EN)</Label>
+                      <Label htmlFor="nameEn">{t.nameEn}</Label>
                       <Input
                         id="nameEn"
                         value={newProduct.nameEn}
@@ -522,7 +632,7 @@ const Index = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="nameCn">Название (CN)</Label>
+                      <Label htmlFor="nameCn">{t.nameCn}</Label>
                       <Input
                         id="nameCn"
                         value={newProduct.nameCn}
@@ -533,7 +643,7 @@ const Index = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="nameRu">Название (RU)</Label>
+                    <Label htmlFor="nameRu">{t.nameRu}</Label>
                     <Input
                       id="nameRu"
                       value={newProduct.nameRu}
@@ -542,9 +652,9 @@ const Index = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="price">Цена</Label>
+                      <Label htmlFor="price">{t.price}</Label>
                       <Input
                         id="price"
                         type="number"
@@ -554,7 +664,7 @@ const Index = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="sku">SKU</Label>
+                      <Label htmlFor="sku">{t.sku}</Label>
                       <Input
                         id="sku"
                         value={newProduct.sku}
@@ -564,9 +674,9 @@ const Index = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="quantity">Количество</Label>
+                      <Label htmlFor="quantity">{t.quantity}</Label>
                       <Input
                         id="quantity"
                         type="number"
@@ -576,7 +686,7 @@ const Index = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="brand">Бренд</Label>
+                      <Label htmlFor="brand">{t.brand}</Label>
                       <Input
                         id="brand"
                         value={newProduct.brand}
@@ -586,15 +696,15 @@ const Index = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="category">Категория</Label>
+                      <Label htmlFor="category">{t.category}</Label>
                       <Select 
                         value={newProduct.category} 
                         onValueChange={(value) => setNewProduct(prev => ({...prev, category: value}))}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Выберите категорию" />
+                          <SelectValue placeholder={`${t.category}...`} />
                         </SelectTrigger>
                         <SelectContent>
                           {allCategories.map(cat => (
@@ -604,7 +714,7 @@ const Index = () => {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="webLink">Веб-ссылка</Label>
+                      <Label htmlFor="webLink">{t.webLink}</Label>
                       <Input
                         id="webLink"
                         value={newProduct.webLink}
@@ -616,10 +726,10 @@ const Index = () => {
 
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline" onClick={() => setShowAddForm(false)}>
-                      Отмена
+                      {t.cancel}
                     </Button>
                     <Button onClick={handleAddProduct}>
-                      Добавить товар
+                      {t.add} {t.products.slice(0, -2)}
                     </Button>
                   </div>
                 </div>
@@ -628,23 +738,23 @@ const Index = () => {
           </div>
           
           {/* Navigation */}
-          <nav className="flex space-x-1">
+          <nav className="flex flex-wrap gap-1">
             {[
-              { id: 'catalog', label: 'Каталог', icon: 'Package' },
-              { id: 'search', label: 'Поиск', icon: 'Search' },
-              { id: 'filters', label: 'Фильтры', icon: 'Filter' },
-              { id: 'favorites', label: 'Избранное', icon: 'Heart' },
-              { id: 'admin', label: 'Админка', icon: 'Settings' }
+              { id: 'catalog', label: t.catalog, icon: 'Package' },
+              { id: 'search', label: t.search, icon: 'Search' },
+              { id: 'filters', label: t.filters, icon: 'Filter' },
+              { id: 'favorites', label: t.favorites, icon: 'Heart' },
+              { id: 'admin', label: t.admin, icon: 'Settings' }
             ].map(tab => (
               <Button
                 key={tab.id}
                 variant={activeTab === tab.id ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setActiveTab(tab.id)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-1 lg:gap-2 text-xs lg:text-sm"
               >
-                <Icon name={tab.icon} size={16} />
-                {tab.label}
+                <Icon name={tab.icon} size={14} />
+                <span className="hidden sm:inline">{tab.label}</span>
               </Button>
             ))}
           </nav>
@@ -652,17 +762,17 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
         
         {/* Search Tab */}
         {activeTab === 'search' && (
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg border">
-              <h3 className="text-lg font-semibold mb-4">Поиск товаров</h3>
+              <h3 className="text-lg font-semibold mb-4">{t.search} {t.products}</h3>
               <div className="flex gap-4">
                 <div className="flex-1">
                   <Input
-                    placeholder="Поиск по названию, SKU, бренду, категории..."
+                    placeholder={t.searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full"
@@ -675,7 +785,7 @@ const Index = () => {
               {searchQuery && (
                 <div className="mt-4">
                   <Badge variant="secondary">
-                    Найдено: {filteredProducts.length} товаров
+                    {t.found}: {filteredProducts.length} {t.products}
                   </Badge>
                 </div>
               )}
@@ -689,7 +799,7 @@ const Index = () => {
                     <div className="grid grid-cols-12 gap-6">
                       
                       {/* Product Images */}
-                      <div className="col-span-3">
+                      <div className="col-span-1 lg:col-span-3">
                         <div className="space-y-4">
                           <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
                             <img
@@ -702,7 +812,7 @@ const Index = () => {
                       </div>
 
                       {/* Product Details */}
-                      <div className="col-span-9 space-y-4">
+                      <div className="col-span-1 lg:col-span-9 space-y-4">
                         
                         {/* Multi-language Names */}
                         <div className="space-y-3">
@@ -763,12 +873,12 @@ const Index = () => {
 
         {/* Filters Tab */}
         {activeTab === 'filters' && (
-          <div className="grid grid-cols-4 gap-6">
-            <div className="col-span-1 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="col-span-1 lg:col-span-1 space-y-6">
               {/* Category Filter */}
               <Card>
                 <CardHeader>
-                  <h3 className="font-semibold">Категории</h3>
+                  <h3 className="font-semibold">{t.categories}</h3>
                 </CardHeader>
                 <CardContent>
                   <CategoryTree categories={categories} />
@@ -778,7 +888,7 @@ const Index = () => {
               {/* Brand Filter */}
               <Card>
                 <CardHeader>
-                  <h3 className="font-semibold">Бренды</h3>
+                  <h3 className="font-semibold">{t.brands}</h3>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -801,13 +911,13 @@ const Index = () => {
               {/* Price Filter */}
               <Card>
                 <CardHeader>
-                  <h3 className="font-semibold">Цена</h3>
+                  <h3 className="font-semibold">{t.price}</h3>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
-                        <Label htmlFor="minPrice" className="text-xs">От</Label>
+                        <Label htmlFor="minPrice" className="text-xs">{t.from}</Label>
                         <Input
                           id="minPrice"
                           type="number"
@@ -817,7 +927,7 @@ const Index = () => {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="maxPrice" className="text-xs">До</Label>
+                        <Label htmlFor="maxPrice" className="text-xs">{t.to}</Label>
                         <Input
                           id="maxPrice"
                           type="number"
@@ -834,13 +944,13 @@ const Index = () => {
               {/* Filter Results */}
               <div>
                 <Badge variant="outline" className="text-sm">
-                  Показано: {filteredProducts.length} товаров
+                  {t.shown}: {filteredProducts.length} {t.products}
                 </Badge>
               </div>
             </div>
 
             {/* Filtered Products */}
-            <div className="col-span-3">
+            <div className="col-span-1 lg:col-span-3">
               <div className="space-y-6">
                 {filteredProducts.map(product => (
                   <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -848,7 +958,7 @@ const Index = () => {
                       <div className="grid grid-cols-12 gap-6">
                         
                         {/* Product Images */}
-                        <div className="col-span-4">
+                        <div className="col-span-1 lg:col-span-4">
                           <div className="space-y-4">
                             <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
                               <img
@@ -861,7 +971,7 @@ const Index = () => {
                         </div>
 
                         {/* Product Details */}
-                        <div className="col-span-8 space-y-4">
+                        <div className="col-span-1 lg:col-span-8 space-y-4">
                           
                           {/* Multi-language Names */}
                           <div className="space-y-2">
@@ -880,7 +990,7 @@ const Index = () => {
                           </div>
 
                           {/* Product Properties */}
-                          <div className="grid grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                               <span className="text-xs text-gray-500">Цена</span>
                               <div className="font-semibold text-lg">${product.price}</div>
@@ -983,7 +1093,7 @@ const Index = () => {
                         
                         {/* Image Count Badge */}
                         <Badge variant="outline" className="text-xs">
-                          {product.images.length} фото
+                          {product.images.length} {t.photos}
                         </Badge>
                       </div>
                     </div>
@@ -1037,7 +1147,7 @@ const Index = () => {
                       </div>
 
                       {/* Product Properties */}
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-3">
                           <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
                             <span className="font-semibold text-sm w-20">Price</span>
@@ -1121,8 +1231,8 @@ const Index = () => {
         {(activeTab === 'favorites' || activeTab === 'admin') && (
           <div className="text-center py-12">
             <Icon name="Construction" size={48} className="mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">Раздел в разработке</h3>
-            <p className="text-gray-500">Функционал "{activeTab}" будет добавлен в следующих версиях</p>
+            <h3 className="text-lg font-semibold text-gray-600 mb-2">{t.inDevelopment}</h3>
+            <p className="text-gray-500">"{activeTab}" {t.functionalityWillBeAdded}</p>
           </div>
         )}
 
