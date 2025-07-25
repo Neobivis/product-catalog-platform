@@ -77,40 +77,9 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
   const { truncated, needsTruncation } = truncateText(currentValue);
   const displayText = isExpanded ? currentValue : truncated;
 
-  const handleSave = async (newRuText: string) => {
-    setIsTranslating(true);
-    
-    try {
-      console.log('Saving text:', { productId, field, newRuText });
-      
-      // Save Russian text immediately
-      onFieldEdit(productId, field, newRuText);
-      
-      // Auto-translate to other languages
-      if (newRuText.trim()) {
-        console.log('Starting translation for:', newRuText);
-        const translations = await translateDescriptions(newRuText);
-        console.log('Translation results:', translations);
-        
-        // Save English translation
-        console.log('Saving English:', { productId, field: `${field}En`, value: translations.en });
-        onFieldEdit(productId, `${field}En`, translations.en);
-        
-        // Save Chinese translation
-        console.log('Saving Chinese:', { productId, field: `${field}Cn`, value: translations.cn });
-        onFieldEdit(productId, `${field}Cn`, translations.cn);
-        
-        console.log('Translations saved successfully');
-      } else {
-        // Clear translations if Russian text is empty
-        onFieldEdit(productId, `${field}En`, '');
-        onFieldEdit(productId, `${field}Cn`, '');
-      }
-    } catch (error) {
-      console.error('Translation failed:', error);
-    } finally {
-      setIsTranslating(false);
-    }
+  const handleSave = (newRuText: string) => {
+    // Save Russian text only
+    onFieldEdit(productId, field, newRuText);
   };
 
   const handleManualTranslate = async () => {
@@ -119,17 +88,19 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
     setIsTranslating(true);
     
     try {
-      console.log('Translating text:', valueRu);
+      console.log('Copying and translating text:', valueRu);
+      
+      // Copy Russian text and translate it
       const translations = await translateDescriptions(valueRu);
       console.log('Translation results:', translations);
       
       // Save English translation
       onFieldEdit(productId, `${field}En`, translations.en);
       
-      // Save Chinese translation
+      // Save Chinese translation  
       onFieldEdit(productId, `${field}Cn`, translations.cn);
       
-      console.log('Translations saved');
+      console.log('Translations copied to EN and CN fields');
     } catch (error) {
       console.error('Manual translation failed:', error);
     } finally {
@@ -221,7 +192,7 @@ const MultiLanguageTextField: React.FC<MultiLanguageTextFieldProps> = ({
         </div>
         
         <div className="text-xs text-gray-500 mt-1">
-          Ctrl+Enter для сохранения, Escape для отмены. Автоматический перевод на EN/CN после сохранения.
+          Ctrl+Enter для сохранения, Escape для отмены. Используйте кнопку "Перевести" для создания переводов.
         </div>
       </div>
     );

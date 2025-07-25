@@ -184,18 +184,11 @@ const Index = () => {
   }, [products, searchQuery, selectedBrands, selectedCategories, priceRange]);
 
   const handleFieldEdit = (productId: string, field: string, value: string | number) => {
-    console.log('handleFieldEdit called:', { productId, field, value });
-    
-    setProducts(prev => {
-      const updatedProducts = prev.map(product => 
-        product.id === productId 
-          ? { ...product, [field]: field === 'price' || field === 'quantity' ? Number(value) : value }
-          : product
-      );
-      
-      console.log('Products updated:', updatedProducts.find(p => p.id === productId));
-      return updatedProducts;
-    });
+    setProducts(prev => prev.map(product => 
+      product.id === productId 
+        ? { ...product, [field]: field === 'price' || field === 'quantity' ? Number(value) : value }
+        : product
+    ));
     
     // Only close editing field for non-translation fields
     if (!field.endsWith('En') && !field.endsWith('Cn')) {
