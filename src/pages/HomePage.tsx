@@ -46,6 +46,13 @@ const HomePage: React.FC = () => {
     setCurrentImage
   } = useProductOperations(products, setProducts);
 
+  const handleProductUpdate = (updatedProduct: Product) => {
+    const updatedProducts = products.map(p => 
+      p.id === updatedProduct.id ? updatedProduct : p
+    );
+    setProducts(updatedProducts);
+  };
+
   // Sort products by creation date (newest first) - simulate with reverse order
   const sortedProducts = useMemo(() => {
     return [...products].reverse();
@@ -177,6 +184,7 @@ const HomePage: React.FC = () => {
                   ...product,
                   ...russianFields
                 }}
+                onUpdate={handleProductUpdate}
               />
             );
           })}
