@@ -202,6 +202,15 @@ const HomePage: React.FC = () => {
           </div>
         )}
 
+        {/* Debug Info */}
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
+          <div>Товаров: {sortedProducts.length}</div>
+          <div>На странице: {itemsPerPage}</div>
+          <div>Текущая страница: {currentPage}</div>
+          <div>Всего страниц: {totalPages}</div>
+          <div>Показано товаров: {paginatedProducts.length}</div>
+        </div>
+
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -215,6 +224,16 @@ const HomePage: React.FC = () => {
             />
           </div>
         )}
+        
+        {/* Always show pagination for testing */}
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+          <div className="text-sm text-blue-700 mb-2">Принудительная пагинация (для тестирования):</div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.max(2, totalPages)} 
+            onPageChange={handlePageChange}
+          />
+        </div>
       </main>
     </div>
   );
