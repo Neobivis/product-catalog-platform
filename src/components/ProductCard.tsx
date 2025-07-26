@@ -20,10 +20,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group">
       {/* Product Image */}
       <div className="relative aspect-square bg-gray-100 overflow-hidden">
-        {product.image ? (
+        {product.images && product.images.length > 0 ? (
           <img
-            src={product.image}
-            alt={product.name}
+            src={product.images[product.currentImageIndex || 0]}
+            alt={product.nameRu || product.nameEn}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
@@ -34,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         )}
         
         {/* Badge for availability */}
-        {product.stock > 0 ? (
+        {product.quantity > 0 ? (
           <div className="absolute top-2 left-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-md">
             В наличии
           </div>
@@ -54,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Product Name */}
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight min-h-[2.5rem]">
-          {product.name}
+          {product.nameRu || product.nameEn}
         </h3>
 
         {/* Description */}
@@ -70,11 +70,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <span className="text-lg font-bold text-gray-900">
               {formatPrice(product.price)}
             </span>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <span className="text-sm text-gray-500 line-through">
-                {formatPrice(product.originalPrice)}
-              </span>
-            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -91,9 +86,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {/* Add to Cart Button */}
             <Button
               size="sm"
-              disabled={product.stock === 0}
+              disabled={product.quantity === 0}
               className="h-8 px-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300"
-              title={product.stock === 0 ? "Нет в наличии" : "Добавить в корзину"}
+              title={product.quantity === 0 ? "Нет в наличии" : "Добавить в корзину"}
             >
               <Icon name="ShoppingCart" size={14} className="mr-1" />
               <span className="hidden sm:inline text-xs">В корзину</span>
@@ -102,10 +97,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Stock indicator */}
-        {product.stock > 0 && product.stock <= 5 && (
+        {product.quantity > 0 && product.quantity <= 5 && (
           <div className="mt-2 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded">
             <Icon name="AlertTriangle" size={12} className="inline mr-1" />
-            Осталось: {product.stock} шт.
+            Осталось: {product.quantity} шт.
           </div>
         )}
       </div>

@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import ProductCard from '@/components/ProductCard';
 import Pagination from '@/components/Pagination';
-import { products, categories } from '@/data/mockData';
+import { useProductsData } from '@/hooks/useProductsData';
 import { Product, Category } from '@/types/product';
 
 const CategoryPage: React.FC = () => {
-  const { categoryPath } = useParams<{ categoryPath: string }>();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Извлекаем путь категории из URL
+  const categoryPath = location.pathname.replace('/category/', '');
   
   const currentPage = parseInt(searchParams.get('page') || '1');
   const itemsPerPage = parseInt(searchParams.get('limit') || '25');
@@ -18,6 +21,9 @@ const CategoryPage: React.FC = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Get data from hook
+  const { products, categories } = useProductsData();
 
   // Find category by path
   const findCategoryByPath = (cats: Category[], path: string): Category | null => {
