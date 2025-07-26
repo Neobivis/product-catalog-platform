@@ -16,8 +16,8 @@ export const useProductOperations = (products: Product[], setProducts: React.Dis
           [field]: field === 'price' || field === 'quantity' ? Number(value) : value 
         };
         
-        // Если Victor сохраняет цену и она больше 0, исключаем товар из категории "Запрос цены"
-        if (authState.currentUser?.role === 'victor' && field === 'price' && Number(value) > 0) {
+        // Если пользователь сохраняет цену и она больше 0, исключаем товар из категории "Запрос цены"
+        if (field === 'price' && Number(value) > 0) {
           const updatedAdditionalCategories = (updatedProduct.additionalCategories || [])
             .filter(cat => cat !== 'Запрос цены');
           
