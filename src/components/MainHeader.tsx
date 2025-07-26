@@ -5,6 +5,7 @@ import { Language, Category } from '@/types/product';
 import LanguageToggle from '@/components/LanguageToggle';
 import AddProductForm from '@/components/AddProductForm';
 import CatalogMenu from '@/components/CatalogMenu';
+import { Link } from 'react-router-dom';
 
 interface MainHeaderProps {
   language: Language;
@@ -40,6 +41,13 @@ const MainHeader: React.FC<MainHeaderProps> = ({
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-4">
           <div className="flex items-center gap-4">
+            {/* Logo */}
+            <Link to="/" className="flex-shrink-0">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg hover:bg-blue-700 transition-colors">
+                П
+              </div>
+            </Link>
+            
             <CatalogMenu categories={categories} translations={t} />
             <h1 className="text-xl lg:text-2xl font-bold text-gray-900">{t.title}</h1>
           </div>
@@ -61,23 +69,41 @@ const MainHeader: React.FC<MainHeaderProps> = ({
         {/* Navigation */}
         <nav className="flex flex-wrap gap-1">
           {[
+            { id: 'home', label: 'Главная', icon: 'Home', isLink: true },
             { id: 'catalog', label: t.catalog, icon: 'Package' },
             { id: 'search', label: t.search, icon: 'Search' },
             { id: 'filters', label: t.filters, icon: 'Filter' },
             { id: 'favorites', label: t.favorites, icon: 'Heart' },
             { id: 'admin', label: t.admin, icon: 'Settings' }
-          ].map(tab => (
-            <Button
-              key={tab.id}
-              variant={activeTab === tab.id ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab(tab.id)}
-              className="flex items-center gap-1 lg:gap-2 text-xs lg:text-sm"
-            >
-              <Icon name={tab.icon} size={14} />
-              <span className="hidden sm:inline">{tab.label}</span>
-            </Button>
-          ))}
+          ].map(tab => {
+            if (tab.isLink) {
+              return (
+                <Link key={tab.id} to="/">
+                  <Button
+                    variant={"ghost"}
+                    size="sm"
+                    className="flex items-center gap-1 lg:gap-2 text-xs lg:text-sm"
+                  >
+                    <Icon name={tab.icon} size={14} />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </Button>
+                </Link>
+              );
+            }
+            
+            return (
+              <Button
+                key={tab.id}
+                variant={activeTab === tab.id ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab(tab.id)}
+                className="flex items-center gap-1 lg:gap-2 text-xs lg:text-sm"
+              >
+                <Icon name={tab.icon} size={14} />
+                <span className="hidden sm:inline">{tab.label}</span>
+              </Button>
+            );
+          })}
         </nav>
       </div>
     </header>

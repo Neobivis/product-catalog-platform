@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Category } from '@/types/product';
+import { useNavigate } from 'react-router-dom';
 
 interface CatalogMenuProps {
   categories: Category[];
@@ -9,6 +10,7 @@ interface CatalogMenuProps {
 }
 
 const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [currentCategories, setCurrentCategories] = useState<Category[]>(categories);
   const [breadcrumb, setBreadcrumb] = useState<Category[]>([]);
@@ -177,7 +179,12 @@ const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={navigateToRoot}
+                    onClick={() => {
+                      navigate('/');
+                      setIsOpen(false);
+                      setCurrentCategories(categories);
+                      setBreadcrumb([]);
+                    }}
                     className="h-6 px-2 text-xs flex-shrink-0"
                   >
                     <Icon name="Home" size={12} className="mr-1" />
@@ -233,6 +240,7 @@ const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }
             <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
               <button
                 onClick={() => {
+                  navigate('/');
                   setIsOpen(false);
                   setCurrentCategories(categories);
                   setBreadcrumb([]);
