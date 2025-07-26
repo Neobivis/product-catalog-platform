@@ -145,7 +145,7 @@ const HomePage: React.FC = () => {
         {/* Page Header */}
         <div className="mb-6">
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
-            Последние товары
+            Главная страница
           </h1>
           <p className="text-gray-600">
             Показаны {paginatedProducts.length} из {sortedProducts.length} товаров (отсортированы по дате создания)
