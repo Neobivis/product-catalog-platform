@@ -84,6 +84,13 @@ export const useUserManagement = () => {
   const [users, setUsers] = useState<User[]>(() => loadUsersFromStorage());
   const [authState, setAuthState] = useState<AuthState>(() => loadAuthFromStorage());
 
+  // Функция для сброса данных пользователей (для отладки)
+  const resetUsers = () => {
+    const defaultUsers = createDefaultUsers();
+    setUsers(defaultUsers);
+    localStorage.removeItem(USERS_STORAGE_KEY);
+  };
+
   // Сохранение при изменениях
   useEffect(() => {
     saveUsersToStorage(users);
@@ -214,6 +221,7 @@ export const useUserManagement = () => {
     logout,
     loginAsAdmin,
     continueAsGuest,
-    validateChineseAccess
+    validateChineseAccess,
+    resetUsers
   };
 };

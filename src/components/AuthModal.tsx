@@ -12,7 +12,7 @@ interface AuthModalProps {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, language }) => {
-  const { login, loginAsAdmin, continueAsGuest, users } = useUserManagement();
+  const { login, loginAsAdmin, continueAsGuest, users, resetUsers } = useUserManagement();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -57,6 +57,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, language }) => {
 
   const handleLogin = () => {
     if (email.trim() && password.trim()) {
+      console.log('Attempting login with:', { email: email.trim(), password: password.trim() });
+      console.log('Available users:', users);
       const success = login(email.trim(), password.trim());
       if (success) {
         setError('');
@@ -151,7 +153,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, language }) => {
           </div>
 
           {/* Продолжить как гость */}
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t space-y-2">
             <Button 
               variant="ghost" 
               onClick={handleGuestContinue}
@@ -159,6 +161,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, language }) => {
             >
               <Icon name="Users" size={16} className="mr-2" />
               {currentT.continueAsGuest}
+            </Button>
+            
+            {/* Временная кнопка для отладки */}
+            <Button 
+              variant="outline"
+              size="sm" 
+              onClick={() => {
+                resetUsers();
+                window.location.reload();
+              }}
+              className="w-full text-xs"
+            >
+              🔄 Сбросить данные пользователей
             </Button>
           </div>
         </CardContent>
