@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Product, Category } from '@/types/product';
 
-export const useProductsData = () => {
-  // Sample data with products
-  const [products, setProducts] = useState<Product[]>([
+// Default products data
+const defaultProducts: Product[] = [
     {
       id: '1',
       nameEn: 'Premium Wireless Headphones',
@@ -14,7 +13,7 @@ export const useProductsData = () => {
       quantity: 45,
       brand: 'TechBrand',
       webLink: 'https://example.com/headphones',
-      category: 'Electronics/Audio',
+      category: 'Электроника/Аудио',
       images: ['/img/cf9d4e6b-0b84-40fa-8944-4ddf188a111f.jpg', '/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
       currentImageIndex: 0,
       description: 'Премиум беспроводные наушники с активным шумоподавлением. Поддержка Hi-Res Audio и LDAC. Время работы до 30 часов. Быстрая зарядка - 3 минуты заряда дают 3 часа прослушивания. Совместимы с Google Assistant и Amazon Alexa. Часто задаваемые вопросы: Подходят ли для спорта? Да, имеют защиту от влаги IPX4. Можно ли подключить к двум устройствам одновременно? Да, поддерживается мультипоинт соединение.',
@@ -35,7 +34,7 @@ export const useProductsData = () => {
       quantity: 78,
       brand: 'FitTech',
       webLink: 'https://example.com/tracker',
-      category: 'Electronics/Wearables',
+      category: 'Электроника/Носимые устройства',
       images: ['/img/c817e33c-f23e-46f9-8803-0e914e9017bd.jpg', '/img/cf9d4e6b-0b84-40fa-8944-4ddf188a111f.jpg'],
       currentImageIndex: 0,
       description: 'Умный фитнес-трекер с GPS и пульсометром. Отслеживает более 100 видов спорта. Водонепроницаемый корпус 5ATM. Мониторинг сна и стресса. Время работы до 14 дней.',
@@ -56,7 +55,7 @@ export const useProductsData = () => {
       quantity: 23,
       brand: 'GameTech',
       webLink: 'https://example.com/laptop',
-      category: 'Electronics/Computers',
+      category: 'Электроника/Компьютеры',
       images: ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
       currentImageIndex: 0,
       description: 'Мощный игровой ноутбук с RTX 4060. Процессор Intel i7-13700H. 16GB RAM, 1TB SSD. Дисплей 15.6" 144Hz.',
@@ -67,9 +66,10 @@ export const useProductsData = () => {
       purpose: 'Игры и работа',
       forWhom: 'Геймеры'
     }
-  ]);
+];
 
-  const [categories, setCategories] = useState<Category[]>([
+// Default categories data  
+const defaultCategories: Category[] = [
     {
       id: 'uncategorized',
       name: 'Без категории',
@@ -122,7 +122,38 @@ export const useProductsData = () => {
       name: 'Автотовары',
       icon: 'Car'
     }
-  ]);
+];
+
+export const useProductsData = () => {
+  // Initialize state with data from localStorage or defaults
+  const [products, setProducts] = useState<Product[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedProducts = localStorage.getItem('products');
+      return savedProducts ? JSON.parse(savedProducts) : defaultProducts;
+    }
+    return defaultProducts;
+  });
+
+  const [categories, setCategories] = useState<Category[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedCategories = localStorage.getItem('categories');
+      return savedCategories ? JSON.parse(savedCategories) : defaultCategories;
+    }
+    return defaultCategories;
+  });
+
+  // Save to localStorage when data changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('products', JSON.stringify(products));
+    }
+  }, [products]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('categories', JSON.stringify(categories));
+    }
+  }, [categories]);
 
   return {
     products,

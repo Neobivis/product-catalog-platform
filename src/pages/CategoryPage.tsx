@@ -41,15 +41,20 @@ const CategoryPage: React.FC = () => {
   };
 
   // Filter products by category
-  const filterProductsByCategory = (category: Category): Product[] => {
-    const categoryPath = getCategoryPath(category);
-    return products.filter(product => 
-      product.category.startsWith(categoryPath)
+  const filterProductsByCategory = (categoryPath: string): Product[] => {
+    const decodedPath = categoryPath.split('/').map(part => decodeURIComponent(part)).join('/');
+    console.log('Filtering products for path:', decodedPath);
+    console.log('Available products:', products.map(p => ({ name: p.nameRu, category: p.category })));
+    
+    const filtered = products.filter(product => 
+      product.category.startsWith(decodedPath)
     );
+    console.log('Filtered products:', filtered.map(p => ({ name: p.nameRu, category: p.category })));
+    return filtered;
   };
 
   // Get full category path
-  const getCategoryPath = (category: Category): string => {
+  const getCategoryPath = (): string => {
     if (!categoryPath) return '';
     return categoryPath.split('/').map(part => decodeURIComponent(part)).join('/');
   };
@@ -83,8 +88,8 @@ const CategoryPage: React.FC = () => {
     const category = findCategoryByPath(categories, categoryPath);
     if (category) {
       setCurrentCategory(category);
-      const products = filterProductsByCategory(category);
-      setFilteredProducts(products);
+      const filteredProds = filterProductsByCategory(categoryPath);
+      setFilteredProducts(filteredProds);
     }
     setIsLoading(false);
   }, [categoryPath]);
