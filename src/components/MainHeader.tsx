@@ -56,7 +56,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
 
   // Проверяем права на админку
   const canAccessAdmin = currentUser 
-    ? hasPermission(currentUser, 'admin', 'all') || hasPermission(currentUser, 'write', 'categories', language)
+    ? (hasPermission(currentUser, 'admin', 'all') || hasPermission(currentUser, 'write', 'categories', language)) && currentUser.role !== 'victor'
     : false;
 
   // Проверяем, нужно ли показывать переключатель языка

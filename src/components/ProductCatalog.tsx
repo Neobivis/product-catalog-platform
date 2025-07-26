@@ -238,7 +238,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           <span className="text-gray-600">{product.price} ¥</span>
                         )}
                       </div>
-                      {onPriceRequest && (
+                      {onPriceRequest && authState.currentUser?.role !== 'victor' && (
                         <Button
                           size="sm"
                           variant={product.price === 0 ? "secondary" : "outline"}
