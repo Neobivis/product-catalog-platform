@@ -7,9 +7,10 @@ import { useNavigate } from 'react-router-dom';
 interface CatalogMenuProps {
   categories: Category[];
   translations: any;
+  onPriceRequestFilter?: () => void;
 }
 
-const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }) => {
+const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t, onPriceRequestFilter }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [currentCategories, setCurrentCategories] = useState<Category[]>(categories);
@@ -257,7 +258,9 @@ const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }
                       <div
                         className="flex items-center justify-between px-4 py-3 cursor-pointer transition-colors hover:bg-green-50 border-b border-green-100 bg-green-25 mt-2 border-t-2 border-t-green-200"
                         onClick={() => {
-                          window.location.href = '/category/Запрос%20цены';
+                          if (onPriceRequestFilter) {
+                            onPriceRequestFilter();
+                          }
                           setIsOpen(false);
                           setCurrentCategories(categories);
                           setBreadcrumb([]);

@@ -26,6 +26,7 @@ interface MainHeaderProps {
   isGuest?: boolean;
   onShowAuth?: () => void;
   onLogout?: () => void;
+  onPriceRequestFilter?: () => void;
 }
 
 const MainHeader: React.FC<MainHeaderProps> = ({
@@ -44,7 +45,8 @@ const MainHeader: React.FC<MainHeaderProps> = ({
   currentUser,
   isGuest,
   onShowAuth,
-  onLogout
+  onLogout,
+  onPriceRequestFilter
 }) => {
 
   // Проверяем права на добавление продуктов
@@ -82,7 +84,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
               />
             </Link>
             
-            <CatalogMenu categories={categories} translations={t} />
+            <CatalogMenu categories={categories} translations={t} onPriceRequestFilter={onPriceRequestFilter} />
 
           </div>
           

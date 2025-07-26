@@ -233,6 +233,11 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
     }));
   };
 
+  const handlePriceRequestFilter = () => {
+    // Фильтруем товары с запросом цены и показываем их
+    toggleCategoryFilter('Запрос цены');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <MainHeader
@@ -252,6 +257,7 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
         isGuest={authState.isGuest}
         onShowAuth={() => setShowAuthModal(true)}
         onLogout={logout}
+        onPriceRequestFilter={handlePriceRequestFilter}
       />
 
       <MainContent
