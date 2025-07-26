@@ -148,9 +148,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(window.location.origin + text);
-  };
+
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(language === 'ru' ? 'ru-RU' : language === 'cn' ? 'zh-CN' : 'en-US');
