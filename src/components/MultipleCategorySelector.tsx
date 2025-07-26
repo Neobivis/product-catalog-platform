@@ -26,7 +26,7 @@ const MultipleCategorySelector: React.FC<MultipleCategorySelectorProps> = ({
   const [modalMode, setModalMode] = useState<'primary' | 'additional'>('primary');
 
   const findCategoryByPath = (cats: Category[], pathParts: string[]): Category | null => {
-    if (pathParts.length === 0) return null;
+    if (!cats || pathParts.length === 0) return null;
     
     const cat = cats.find(c => c.name === pathParts[0]);
     if (!cat) return null;
@@ -41,7 +41,7 @@ const MultipleCategorySelector: React.FC<MultipleCategorySelectorProps> = ({
   };
 
   const getCategoryIcon = (categoryPath: string) => {
-    if (!categoryPath) return null;
+    if (!categoryPath || !categories) return null;
     const pathParts = categoryPath.split('/');
     const category = findCategoryByPath(categories, pathParts);
     return category?.icon;
