@@ -5,7 +5,6 @@ import { Language, Category } from '@/types/product';
 import LanguageToggle from '@/components/LanguageToggle';
 import AddProductForm from '@/components/AddProductForm';
 import CatalogMenu from '@/components/CatalogMenu';
-import ResetDataButton from '@/components/ResetDataButton';
 import { Link } from 'react-router-dom';
 
 interface MainHeaderProps {
@@ -61,11 +60,6 @@ const MainHeader: React.FC<MainHeaderProps> = ({
             </Link>
             
             <CatalogMenu categories={categories} translations={t} />
-            
-            {/* Reset Data Button */}
-            <div className="ml-4">
-              <ResetDataButton />
-            </div>
 
           </div>
           
