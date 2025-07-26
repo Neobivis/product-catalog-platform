@@ -16,6 +16,7 @@ interface ProductCatalogProps {
   onFieldEdit: (productId: string, field: string, value: string | number) => void;
   onImageNavigation: (productId: string, direction: 'prev' | 'next') => void;
   onShowImageManager: (productId: string) => void;
+  onImageClick: (product: Product) => void;
 }
 
 const FlagIcon: React.FC<{ country: 'us' | 'cn' | 'ru' }> = ({ country }) => {
@@ -55,7 +56,8 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
   setEditingField,
   onFieldEdit,
   onImageNavigation,
-  onShowImageManager
+  onShowImageManager,
+  onImageClick
 }) => {
   return (
     <div className="space-y-6">
@@ -72,7 +74,8 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                     <img
                       src={product.images[product.currentImageIndex]}
                       alt={product.nameEn}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover cursor-pointer transition-transform hover:scale-105"
+                      onClick={() => onImageClick(product)}
                     />
                     {product.images.length > 1 && (
                       <>

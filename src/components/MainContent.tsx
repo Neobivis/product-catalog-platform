@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 import { Product, Category, Language } from '@/types/product';
 import SearchAndFilters from '@/components/SearchAndFilters';
 import ProductCatalog from '@/components/ProductCatalog';
 import ImageManager from '@/components/ImageManager';
+import ImageModal from '@/components/ImageModal';
 
 interface MainContentProps {
   activeTab: string;
@@ -64,6 +65,37 @@ const MainContent: React.FC<MainContentProps> = ({
   onRemoveImage,
   onSetCurrentImage
 }) => {
+  const [modalProduct, setModalProduct] = useState<Product | null>(null);
+
+  // Update modal product when products array changes
+  useEffect(() => {
+    if (modalProduct) {
+      const updatedProduct = products.find(p => p.id === modalProduct.id);
+      if (updatedProduct) {
+        setModalProduct(updatedProduct);
+      }
+    }
+  }, [products, modalProduct]);
+
+  const handleImageClick = (product: Product) => {
+    setModalProduct(product);
+  };
+
+  const handleModalClose = () => {
+    setModalProduct(null);
+  };
+
+  const handleModalPrevImage = () => {
+    if (modalProduct) {
+      onImageNavigation(modalProduct.id, 'prev');
+    }
+  };
+
+  const handleModalNextImage = () => {
+    if (modalProduct) {
+      onImageNavigation(modalProduct.id, 'next');
+    }
+  };
   return (
     <main className="max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
       
@@ -96,6 +128,7 @@ const MainContent: React.FC<MainContentProps> = ({
           onFieldEdit={onFieldEdit}
           onImageNavigation={onImageNavigation}
           onShowImageManager={setShowImageManager}
+          onImageClick={handleImageClick}
         />
       )}
 
@@ -124,6 +157,15 @@ const MainContent: React.FC<MainContentProps> = ({
           onSetCurrentImage={onSetCurrentImage}
         />
       ))}
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={modalProduct !== null}
+        onClose={handleModalClose}
+        product={modalProduct}
+        onPrevImage={handleModalPrevImage}
+        onNextImage={handleModalNextImage}
+      />
     </main>
   );
 };
