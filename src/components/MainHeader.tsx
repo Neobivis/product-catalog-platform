@@ -60,7 +60,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
             </Link>
             
             <CatalogMenu categories={categories} translations={t} />
-            <h1 className="text-xl lg:text-2xl font-bold text-gray-900">{t.title}</h1>
+
           </div>
           
           <div className="flex items-center gap-4">
