@@ -43,9 +43,12 @@ export const useFilters = (products: Product[], categories: Category[]) => {
       // Brand filter
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
 
-      // Category filter
+      // Category filter - проверяем как основную, так и дополнительные категории
       const matchesCategory = selectedCategories.length === 0 || 
-        selectedCategories.some(cat => product.category.includes(cat));
+        selectedCategories.some(cat => 
+          product.category.includes(cat) || 
+          (product.additionalCategories && product.additionalCategories.some(addCat => addCat.includes(cat)))
+        );
 
       // Price filter
       const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;

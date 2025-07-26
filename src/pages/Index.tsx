@@ -193,6 +193,20 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
     }));
   };
 
+  const handleAdditionalCategoriesChange = (productId: string, additionalCategories: string[]) => {
+    // Проверяем права на изменение товаров
+    if (!hasPermission(authState.currentUser, 'write', 'products', language)) {
+      alert(t.noPermission || 'У вас нет прав для выполнения этого действия');
+      return;
+    }
+
+    setProducts(prev => prev.map(product => 
+      product.id === productId 
+        ? { ...product, additionalCategories }
+        : product
+    ));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <MainHeader
@@ -243,6 +257,7 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
         onRemoveImage={removeImageFromProduct}
         onSetCurrentImage={setCurrentImage}
         onUpdateCategories={handleUpdateCategories}
+        onAdditionalCategoriesChange={handleAdditionalCategoriesChange}
       />
 
       {/* Модальное окно авторизации */}

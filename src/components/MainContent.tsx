@@ -37,6 +37,7 @@ interface MainContentProps {
   onRemoveImage: (productId: string, imageIndex: number) => void;
   onSetCurrentImage: (productId: string, index: number) => void;
   onUpdateCategories: (categories: Category[]) => void;
+  onAdditionalCategoriesChange: (productId: string, categories: string[]) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -100,6 +101,10 @@ const MainContent: React.FC<MainContentProps> = ({
       onImageNavigation(modalProduct.id, 'next');
     }
   };
+
+  const handleAdditionalCategoriesChange = (productId: string, categories: string[]) => {
+    onAdditionalCategoriesChange(productId, categories);
+  };
   return (
     <main className="max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
       
@@ -134,6 +139,7 @@ const MainContent: React.FC<MainContentProps> = ({
           onImageNavigation={onImageNavigation}
           onShowImageManager={setShowImageManager}
           onImageClick={handleImageClick}
+          onAdditionalCategoriesChange={handleAdditionalCategoriesChange}
         />
       )}
 

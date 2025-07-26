@@ -8,7 +8,8 @@ export interface Product {
   quantity: number;
   brand: string;
   webLink: string;
-  category: string;
+  category: string; // Основная категория
+  additionalCategories?: string[]; // Дополнительные категории
   images: string[];
   currentImageIndex: number;
   description?: string;

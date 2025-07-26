@@ -5,7 +5,7 @@ import Icon from '@/components/ui/icon';
 import EditableField from '@/components/EditableField';
 import PriceField from '@/components/PriceField';
 import MultiLanguageTextField from '@/components/MultiLanguageTextField';
-import CategorySelector from '@/components/CategorySelector';
+import MultipleCategorySelector from '@/components/MultipleCategorySelector';
 import { Product, Language, Category } from '@/types/product';
 
 interface ProductCatalogProps {
@@ -19,6 +19,7 @@ interface ProductCatalogProps {
   onImageNavigation: (productId: string, direction: 'prev' | 'next') => void;
   onShowImageManager: (productId: string) => void;
   onImageClick: (product: Product) => void;
+  onAdditionalCategoriesChange: (productId: string, categories: string[]) => void;
 }
 
 const FlagIcon: React.FC<{ country: 'us' | 'cn' | 'ru' }> = ({ country }) => {
@@ -285,16 +286,15 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
-                      <span className="font-semibold text-sm w-20">{t.categoryField}</span>
-                      <div className="flex-1">
-                        <CategorySelector
-                          categories={categories}
-                          value={product.category}
-                          onChange={(value) => onFieldEdit(product.id, 'category', value)}
-                          placeholder="Выберите категорию"
-                        />
-                      </div>
+                    <div className="p-3 bg-white border rounded-lg">
+                      <MultipleCategorySelector
+                        categories={categories}
+                        primaryCategory={product.category}
+                        additionalCategories={product.additionalCategories || []}
+                        onPrimaryCategoryChange={(value) => onFieldEdit(product.id, 'category', value)}
+                        onAdditionalCategoriesChange={(categories) => onAdditionalCategoriesChange(product.id, categories)}
+                        translations={t}
+                      />
                     </div>
                   </div>
                 </div>
