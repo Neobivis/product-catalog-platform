@@ -46,9 +46,18 @@ const CategoryPage: React.FC = () => {
     console.log('Filtering products for path:', decodedPath);
     console.log('Available products:', products.map(p => ({ name: p.nameRu, category: p.category })));
     
-    const filtered = products.filter(product => 
-      product.category.startsWith(decodedPath)
-    );
+    const filtered = products.filter(product => {
+      // Normalize both category paths for comparison
+      const normalizedProductCategory = product.category.trim();
+      const normalizedSearchPath = decodedPath.trim();
+      
+      // Check if product category starts with the search path
+      const matches = normalizedProductCategory.startsWith(normalizedSearchPath);
+      
+      console.log(`Comparing "${normalizedProductCategory}" with "${normalizedSearchPath}": ${matches}`);
+      return matches;
+    });
+    
     console.log('Filtered products:', filtered.map(p => ({ name: p.nameRu, category: p.category })));
     return filtered;
   };
