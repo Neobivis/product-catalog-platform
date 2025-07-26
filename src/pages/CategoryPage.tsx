@@ -251,6 +251,26 @@ const CategoryPage: React.FC = () => {
     ));
   };
 
+  const handlePriceRequest = (productId: string) => {
+    setProducts(prev => prev.map(product => {
+      if (product.id === productId) {
+        const updatedAdditionalCategories = product.additionalCategories || [];
+        
+        // Добавляем категорию "Запрос цены", если её ещё нет
+        if (!updatedAdditionalCategories.includes('Запрос цены')) {
+          updatedAdditionalCategories.push('Запрос цены');
+        }
+
+        return {
+          ...product,
+          price: 0, // Обнуляем цену
+          additionalCategories: updatedAdditionalCategories
+        };
+      }
+      return product;
+    }));
+  };
+
   // Get all unique categories for form
   const allCategories = Array.from(new Set(products.map(p => p.category))).filter(Boolean);
 
@@ -406,6 +426,7 @@ const CategoryPage: React.FC = () => {
               onShowImageManager={setShowImageManager}
               onImageClick={setSelectedProduct}
               onAdditionalCategoriesChange={handleAdditionalCategoriesChange}
+              onPriceRequest={handlePriceRequest}
             />
 
             {/* Bottom Pagination */}

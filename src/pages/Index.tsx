@@ -207,6 +207,32 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
     ));
   };
 
+  const handlePriceRequest = (productId: string) => {
+    // Проверяем права на изменение товаров
+    if (!hasPermission(authState.currentUser, 'write', 'products', language)) {
+      alert(t.noPermission || 'У вас нет прав для выполнения этого действия');
+      return;
+    }
+
+    setProducts(prev => prev.map(product => {
+      if (product.id === productId) {
+        const updatedAdditionalCategories = product.additionalCategories || [];
+        
+        // Добавляем категорию "Запрос цены", если её ещё нет
+        if (!updatedAdditionalCategories.includes('Запрос цены')) {
+          updatedAdditionalCategories.push('Запрос цены');
+        }
+
+        return {
+          ...product,
+          price: 0, // Обнуляем цену
+          additionalCategories: updatedAdditionalCategories
+        };
+      }
+      return product;
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <MainHeader
@@ -258,6 +284,7 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
         onSetCurrentImage={setCurrentImage}
         onUpdateCategories={handleUpdateCategories}
         onAdditionalCategoriesChange={handleAdditionalCategoriesChange}
+        onPriceRequest={handlePriceRequest}
       />
 
       {/* Модальное окно авторизации */}

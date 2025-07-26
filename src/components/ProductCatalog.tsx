@@ -20,6 +20,7 @@ interface ProductCatalogProps {
   onShowImageManager: (productId: string) => void;
   onImageClick: (product: Product) => void;
   onAdditionalCategoriesChange: (productId: string, categories: string[]) => void;
+  onPriceRequest?: (productId: string) => void;
 }
 
 const FlagIcon: React.FC<{ country: 'us' | 'cn' | 'ru' }> = ({ country }) => {
@@ -62,7 +63,8 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
   onImageNavigation,
   onShowImageManager,
   onImageClick,
-  onAdditionalCategoriesChange
+  onAdditionalCategoriesChange,
+  onPriceRequest
 }) => {
   return (
     <div className="space-y-6">
@@ -226,6 +228,22 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           onFieldEdit={onFieldEdit}
                         />
                       </div>
+                      {onPriceRequest && (
+                        <Button
+                          size="sm"
+                          variant={product.price === 0 ? "secondary" : "outline"}
+                          onClick={() => onPriceRequest(product.id)}
+                          className="flex-shrink-0"
+                          disabled={product.price === 0}
+                        >
+                          <Icon 
+                            name={product.price === 0 ? "Check" : "MessageSquare"} 
+                            size={14} 
+                            className="mr-1" 
+                          />
+                          {product.price === 0 ? t.priceRequested : t.requestPrice}
+                        </Button>
+                      )}
                     </div>
                     
                     <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">

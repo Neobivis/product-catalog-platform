@@ -38,6 +38,7 @@ interface MainContentProps {
   onSetCurrentImage: (productId: string, index: number) => void;
   onUpdateCategories: (categories: Category[]) => void;
   onAdditionalCategoriesChange: (productId: string, categories: string[]) => void;
+  onPriceRequest: (productId: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -69,7 +70,8 @@ const MainContent: React.FC<MainContentProps> = ({
   onRemoveImage,
   onSetCurrentImage,
   onUpdateCategories,
-  onAdditionalCategoriesChange
+  onAdditionalCategoriesChange,
+  onPriceRequest
 }) => {
   const [modalProduct, setModalProduct] = useState<Product | null>(null);
 
@@ -141,6 +143,7 @@ const MainContent: React.FC<MainContentProps> = ({
           onShowImageManager={setShowImageManager}
           onImageClick={handleImageClick}
           onAdditionalCategoriesChange={handleAdditionalCategoriesChange}
+          onPriceRequest={onPriceRequest}
         />
       )}
 
