@@ -22,6 +22,30 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
     role: 'viewer' as UserRole
   });
 
+  // Функция для копирования ссылки в буфер обмена
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('Ссылка для входа скопирована в буфер обмена!');
+    } catch (err) {
+      console.error('Ошибка при копировании:', err);
+      // Fallback для старых браузеров
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Ссылка для входа скопирована в буфер обмена!');
+    }
+  };
+
+  // Генерация специальной ссылки для пользователя
+  const generateSpecialLink = (userId: string) => {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/?auto-login=${userId}`;
+  };
+
   const t = {
     ru: {
       title: 'Управление пользователями',
@@ -221,11 +245,12 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    {user.specialLink && (
+                    {user.role === 'victor' && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => copyToClipboard(user.specialLink!)}
+                        onClick={() => copyToClipboard(generateSpecialLink(user.id))}
+                        title="Скопировать ссылку для входа"
                       >
                         <Icon name="Link" size={14} />
                       </Button>

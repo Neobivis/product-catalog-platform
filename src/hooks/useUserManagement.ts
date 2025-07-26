@@ -196,6 +196,26 @@ export const useUserManagement = () => {
     }
   };
 
+  // Вход пользователя по ID (для специальных ссылок)
+  const loginUserById = (userId: string): boolean => {
+    const user = users.find(u => u.id === userId && u.isActive);
+    
+    if (user) {
+      const newAuthState: AuthState = {
+        currentUser: { ...user, lastLogin: new Date().toISOString() },
+        isAuthenticated: true,
+        isGuest: false
+      };
+      setAuthState(newAuthState);
+      
+      // Обновляем время последнего входа
+      updateUser(user.id, { lastLogin: new Date().toISOString() });
+      
+      return true;
+    }
+    return false;
+  };
+
   // Вход как гость
   const continueAsGuest = (): void => {
     setAuthState({
@@ -219,6 +239,7 @@ export const useUserManagement = () => {
     login,
     logout,
     loginAsAdmin,
+    loginUserById,
     continueAsGuest,
     validateChineseAccess,
     resetUsers

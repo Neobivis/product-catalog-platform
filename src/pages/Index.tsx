@@ -24,10 +24,23 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
   });
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [hasRedirectedVictor, setHasRedirectedVictor] = useState(false);
-  const { authState, logout } = useUserManagement();
+  const { authState, logout, loginUserById } = useUserManagement();
   const navigate = useNavigate();
   
   const t = translations[language];
+
+  // Обработка автоматического входа по ссылке
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoLoginUserId = urlParams.get('auto-login');
+    
+    if (autoLoginUserId && !authState.isAuthenticated && loginUserById) {
+      loginUserById(autoLoginUserId);
+      // Очищаем URL от параметра
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [authState.isAuthenticated, loginUserById]);
 
   // Принудительный язык для китайской версии
   useEffect(() => {
