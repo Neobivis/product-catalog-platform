@@ -23,6 +23,7 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
     return 'ru';
   });
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [hasRedirectedVictor, setHasRedirectedVictor] = useState(false);
   const { authState, logout } = useUserManagement();
   const navigate = useNavigate();
   
@@ -42,12 +43,20 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
     }
   }, [authState.currentUser, forceLanguage]);
 
-  // Автоматический переход Victor в раздел "Запрос цены"
+  // Автоматический переход Victor в раздел "Запрос цены" только при первом входе
   useEffect(() => {
-    if (authState.currentUser?.role === 'victor' && !forceLanguage) {
+    if (authState.currentUser?.role === 'victor' && !forceLanguage && !hasRedirectedVictor) {
+      setHasRedirectedVictor(true);
       navigate('/price-requests');
     }
-  }, [authState.currentUser, navigate, forceLanguage]);
+  }, [authState.currentUser, navigate, forceLanguage, hasRedirectedVictor]);
+
+  // Сброс флага при смене пользователя
+  useEffect(() => {
+    if (!authState.currentUser || authState.currentUser.role !== 'victor') {
+      setHasRedirectedVictor(false);
+    }
+  }, [authState.currentUser]);
 
   // Показываем модальное окно авторизации при первом запуске (если не гость)
   useEffect(() => {
