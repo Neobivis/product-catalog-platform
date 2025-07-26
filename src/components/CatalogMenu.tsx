@@ -272,7 +272,7 @@ const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t, 
                             size={18} 
                             className="text-green-600 flex-shrink-0" 
                           />
-                          <span className="text-sm font-medium text-green-700">{t.priceRequestCategory || 'Запрос цены'}</span>
+                          <span className="text-sm font-medium text-green-700">Запрос цены</span>
                         </div>
                         <Icon name="ExternalLink" size={16} className="text-green-400" />
                       </div>

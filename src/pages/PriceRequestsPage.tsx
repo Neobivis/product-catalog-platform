@@ -230,8 +230,8 @@ const PriceRequestsPage: React.FC<PriceRequestsPageProps> = ({ forceLanguage }) 
               <Icon name="MessageSquare" size={20} className="text-green-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{t.priceRequestCategory || 'Запрос цены'}</h1>
-              <p className="text-gray-600">{language === 'cn' ? '需要询价的产品' : 'Товары с запросом индивидуальной цены'}</p>
+              <h1 className="text-2xl font-bold text-gray-900">Запрос цены</h1>
+              <p className="text-gray-600">Товары с запросом индивидуальной цены</p>
             </div>
           </div>
         </div>
@@ -241,7 +241,7 @@ const PriceRequestsPage: React.FC<PriceRequestsPageProps> = ({ forceLanguage }) 
           <div className="flex items-center gap-3">
             <Icon name="Info" size={16} className="text-green-600" />
             <span className="text-green-800 font-medium">
-              {language === 'cn' ? `找到产品: ${priceRequestProducts.length}` : `Найдено товаров: ${priceRequestProducts.length}`}
+              Найдено товаров: {priceRequestProducts.length}
             </span>
           </div>
         </div>
@@ -274,15 +274,15 @@ const PriceRequestsPage: React.FC<PriceRequestsPageProps> = ({ forceLanguage }) 
               <Icon name="MessageSquare" size={32} className="text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {language === 'cn' ? '没有询价产品' : 'Нет товаров с запросом цены'}
+              Нет товаров с запросом цены
             </h3>
             <p className="text-gray-500 mb-6">
-              {language === 'cn' ? '当产品被添加到询价时，它们将出现在这里' : 'Когда товары будут добавлены в запрос цены, они появятся здесь'}
+              Когда товары будут добавлены в запрос цены, они появятся здесь
             </p>
             <Link to="/">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 <Icon name="ArrowLeft" size={16} className="mr-2" />
-                {language === 'cn' ? '返回目录' : 'Вернуться к каталогу'}
+                Вернуться к каталогу
               </Button>
             </Link>
           </div>
