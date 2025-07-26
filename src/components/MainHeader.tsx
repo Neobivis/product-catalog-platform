@@ -49,13 +49,16 @@ const MainHeader: React.FC<MainHeaderProps> = ({
 
   // Проверяем права на добавление продуктов
   const canAddProducts = currentUser 
-    ? hasPermission(currentUser, 'write', 'products', language)
+    ? hasPermission(currentUser, 'write', 'products', language) && currentUser.role !== 'chinese_only'
     : false;
 
   // Проверяем права на админку
   const canAccessAdmin = currentUser 
     ? hasPermission(currentUser, 'admin', 'all') || hasPermission(currentUser, 'write', 'categories', language)
     : false;
+
+  // Проверяем, нужно ли показывать переключатель языка
+  const showLanguageToggle = !currentUser || currentUser.role !== 'chinese_only';
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 lg:px-6 py-4 shadow-sm backdrop-blur-sm bg-white/95">
       <div className="max-w-7xl mx-auto">
@@ -84,7 +87,9 @@ const MainHeader: React.FC<MainHeaderProps> = ({
           </div>
           
           <div className="flex items-center gap-4">
-            <LanguageToggle language={language} onLanguageChange={onLanguageChange} />
+            {showLanguageToggle && (
+              <LanguageToggle language={language} onLanguageChange={onLanguageChange} />
+            )}
             {canAddProducts && (
               <AddProductForm
                 showAddForm={showAddForm}

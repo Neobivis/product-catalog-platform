@@ -16,7 +16,11 @@ interface IndexProps {
 }
 
 const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
-  const [language, setLanguage] = useState<Language>(forceLanguage || 'ru');
+  const [language, setLanguage] = useState<Language>(() => {
+    // Устанавливаем язык по умолчанию
+    if (forceLanguage) return forceLanguage;
+    return 'ru';
+  });
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { authState, logout } = useUserManagement();
   
@@ -28,6 +32,13 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
       setLanguage(forceLanguage);
     }
   }, [forceLanguage]);
+
+  // Автоматическое переключение на китайский для пользователей chinese_only
+  useEffect(() => {
+    if (authState.currentUser?.role === 'chinese_only' && !forceLanguage) {
+      setLanguage('cn');
+    }
+  }, [authState.currentUser, forceLanguage]);
 
   // Показываем модальное окно авторизации при первом запуске (если не гость)
   useEffect(() => {
