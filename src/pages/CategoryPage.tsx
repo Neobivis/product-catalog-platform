@@ -7,7 +7,6 @@ import ProductCatalog from '@/components/ProductCatalog';
 import Pagination from '@/components/Pagination';
 import ImageModal from '@/components/ImageModal';
 import MainHeader from '@/components/MainHeader';
-import MainContent from '@/components/MainContent';
 import { useProductsData } from '@/hooks/useProductsData';
 import { useProductOperations } from '@/hooks/useProductOperations';
 import { Product, Category, Language } from '@/types/product';
@@ -38,14 +37,8 @@ const CategoryPage: React.FC = () => {
   });
   const [activeTab, setActiveTab] = useState('catalog');
   
-  // States for MainContent
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState({min: 0, max: 10000});
-  
   // Get data from hook
-  const { products, setProducts, categories, setCategories } = useProductsData();
+  const { products, setProducts, categories } = useProductsData();
   
   // Get product operations for editing
   const {
@@ -238,42 +231,6 @@ const CategoryPage: React.FC = () => {
 
   // Get all unique categories for form
   const allCategories = Array.from(new Set(products.map(p => p.category))).filter(Boolean);
-  
-  // Get all unique brands
-  const brands = Array.from(new Set(products.map(p => p.brand))).filter(Boolean);
-  
-  // Filter toggle functions
-  const onToggleBrandFilter = (brand: string) => {
-    setSelectedBrands(prev => 
-      prev.includes(brand) 
-        ? prev.filter(b => b !== brand)
-        : [...prev, brand]
-    );
-  };
-  
-  const onToggleCategoryFilter = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
-  
-  // Filter products for MainContent
-  const filteredProductsForMainContent = useMemo(() => {
-    return products.filter(product => {
-      const matchesSearch = !searchQuery || 
-        product.nameRu?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.nameEn?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
-      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
-      const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
-      
-      return matchesSearch && matchesBrand && matchesCategory && matchesPrice;
-    });
-  }, [products, searchQuery, selectedBrands, selectedCategories, priceRange]);
 
   const addProduct = () => {
     if (newProduct.nameEn && newProduct.price > 0) {
@@ -311,17 +268,6 @@ const CategoryPage: React.FC = () => {
 
   const breadcrumb = getBreadcrumb();
 
-  // Debug info
-  console.log('CategoryPage render:', { categoryPath, isLoading, products: products.length, filteredProducts: filteredProducts.length });
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg">Загрузка...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <MainHeader
@@ -339,42 +285,8 @@ const CategoryPage: React.FC = () => {
         setActiveTab={setActiveTab}
       />
 
-      {/* Show MainContent for other tabs */}
-      {activeTab !== 'catalog' ? (
-        <MainContent
-          activeTab={activeTab}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedBrands={selectedBrands}
-          selectedCategories={selectedCategories}
-          priceRange={priceRange}
-          setPriceRange={setPriceRange}
-          brands={brands}
-          categories={categories}
-          filteredProducts={filteredProductsForMainContent}
-          products={products}
-          language={language}
-          translations={t}
-          onToggleBrandFilter={onToggleBrandFilter}
-          onToggleCategoryFilter={onToggleCategoryFilter}
-          editingField={editingField}
-          setEditingField={setEditingField}
-          onFieldEdit={handleFieldEdit}
-          onImageNavigation={handleImageNavigation}
-          showImageManager={showImageManager}
-          setShowImageManager={setShowImageManager}
-          newImageUrl={newImageUrl}
-          setNewImageUrl={setNewImageUrl}
-          onFileUpload={handleFileUpload}
-          onAddImageByUrl={addImageByUrl}
-          onRemoveImage={removeImageFromProduct}
-          onSetCurrentImage={setCurrentImage}
-          onUpdateCategories={setCategories}
-        />
-      ) : (
-        <>
-          {/* Header */}
-          <div className="bg-white shadow-sm border-b">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
           <nav className="mb-4">
@@ -509,8 +421,6 @@ const CategoryPage: React.FC = () => {
           />
         )}
       </div>
-      </>
-      )}
     </div>
   );
 };
