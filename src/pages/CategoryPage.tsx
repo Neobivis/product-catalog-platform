@@ -260,7 +260,7 @@ const CategoryPage: React.FC = () => {
   };
   
   // Filter products for MainContent
-  const filteredProducts = useMemo(() => {
+  const filteredProductsForMainContent = useMemo(() => {
     return products.filter(product => {
       const matchesSearch = !searchQuery || 
         product.nameRu?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -340,7 +340,7 @@ const CategoryPage: React.FC = () => {
           setPriceRange={setPriceRange}
           brands={brands}
           categories={categories}
-          filteredProducts={filteredProducts}
+          filteredProducts={filteredProductsForMainContent}
           products={products}
           language={language}
           translations={t}
