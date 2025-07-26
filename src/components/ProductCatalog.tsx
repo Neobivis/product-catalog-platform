@@ -238,7 +238,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           <span className="text-gray-600">{product.price} ¥</span>
                         )}
                       </div>
-                      {onPriceRequest && authState.currentUser?.role !== 'victor' && (
+                      {onPriceRequest && authState.currentUser && authState.currentUser.role !== 'victor' && (
                         <Button
                           size="sm"
                           variant={product.price === 0 ? "secondary" : "outline"}
@@ -326,7 +326,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                       </div>
                     </div>
                     
-                    {authState.currentUser?.role !== 'victor' && (
+                    {authState.currentUser && authState.currentUser.role !== 'victor' && (
                       <div className="p-3 bg-white border rounded-lg">
                         <MultipleCategorySelector
                           categories={categories}

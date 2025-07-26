@@ -11,6 +11,7 @@ interface EditableFieldProps {
   editingField: {productId: string, field: string} | null;
   setEditingField: (field: {productId: string, field: string} | null) => void;
   onFieldEdit: (productId: string, field: string, value: string | number) => void;
+  disabled?: boolean;
 }
 
 const EditableField: React.FC<EditableFieldProps> = ({ 
@@ -20,7 +21,8 @@ const EditableField: React.FC<EditableFieldProps> = ({
   type = 'text',
   editingField,
   setEditingField,
-  onFieldEdit
+  onFieldEdit,
+  disabled = false
 }) => {
   const isEditing = editingField?.productId === productId && editingField?.field === field;
 
@@ -97,14 +99,16 @@ const EditableField: React.FC<EditableFieldProps> = ({
       <div className="flex-1 min-w-0">
         {renderValue(value)}
       </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 flex-shrink-0"
-        onClick={() => setEditingField({ productId, field })}
-      >
-        <Icon name="Edit2" size={12} />
-      </Button>
+      {!disabled && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 flex-shrink-0"
+          onClick={() => setEditingField({ productId, field })}
+        >
+          <Icon name="Edit2" size={12} />
+        </Button>
+      )}
     </div>
   );
 };

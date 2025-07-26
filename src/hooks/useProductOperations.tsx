@@ -21,8 +21,15 @@ export const useProductOperations = (products: Product[], setProducts: React.Dis
           const updatedAdditionalCategories = (updatedProduct.additionalCategories || [])
             .filter(cat => cat !== 'Запрос цены');
           
+          // Если основная категория "Запрос цены", меняем её на первую доступную дополнительную категорию
+          let newCategory = updatedProduct.category;
+          if (updatedProduct.category === 'Запрос цены') {
+            newCategory = updatedAdditionalCategories.length > 0 ? updatedAdditionalCategories[0] : '';
+          }
+          
           return {
             ...updatedProduct,
+            category: newCategory,
             additionalCategories: updatedAdditionalCategories
           };
         }
