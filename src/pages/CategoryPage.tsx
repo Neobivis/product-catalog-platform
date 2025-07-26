@@ -45,7 +45,7 @@ const CategoryPage: React.FC = () => {
   const [priceRange, setPriceRange] = useState({min: 0, max: 10000});
   
   // Get data from hook
-  const { products, setProducts, categories } = useProductsData();
+  const { products, setProducts, categories, setCategories } = useProductsData();
   
   // Get product operations for editing
   const {
@@ -310,6 +310,17 @@ const CategoryPage: React.FC = () => {
   };
 
   const breadcrumb = getBreadcrumb();
+
+  // Debug info
+  console.log('CategoryPage render:', { categoryPath, isLoading, products: products.length, filteredProducts: filteredProducts.length });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-lg">Загрузка...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
