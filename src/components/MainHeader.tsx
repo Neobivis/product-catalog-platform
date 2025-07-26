@@ -86,6 +86,14 @@ const MainHeader: React.FC<MainHeaderProps> = ({
             
             <CatalogMenu categories={categories} translations={t} onPriceRequestFilter={onPriceRequestFilter} />
 
+            {/* Кнопка Запрос цены */}
+            <Link to="/price-requests">
+              <Button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 h-10 rounded-md font-medium flex items-center gap-2 shadow-sm">
+                <Icon name="MessageSquare" size={18} />
+                <span className="hidden sm:inline">Запрос цены</span>
+              </Button>
+            </Link>
+
           </div>
           
           <div className="flex items-center gap-4">
