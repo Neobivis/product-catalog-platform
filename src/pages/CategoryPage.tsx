@@ -6,6 +6,7 @@ import Icon from '@/components/ui/icon';
 import ProductCatalog from '@/components/ProductCatalog';
 import Pagination from '@/components/Pagination';
 import ImageModal from '@/components/ImageModal';
+import MainHeader from '@/components/MainHeader';
 import { useProductsData } from '@/hooks/useProductsData';
 import { useProductOperations } from '@/hooks/useProductOperations';
 import { Product, Category, Language } from '@/types/product';
@@ -26,6 +27,15 @@ const CategoryPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [language, setLanguage] = useState<Language>('ru');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  
+  // MainHeader states
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    nameEn: '', nameCn: '', nameRu: '', price: 0, sku: '', quantity: 0,
+    brand: '', webLink: '', category: '', description: '', descriptionEn: '', descriptionCn: '',
+    tnved: '', material: '', purpose: '', forWhom: ''
+  });
+  const [activeTab, setActiveTab] = useState('catalog');
   
   // Get data from hook
   const { products, setProducts, categories } = useProductsData();
@@ -219,10 +229,62 @@ const CategoryPage: React.FC = () => {
     setProducts(updatedProducts);
   };
 
+  // Get all unique categories for form
+  const allCategories = Array.from(new Set(products.map(p => p.category))).filter(Boolean);
+
+  const addProduct = () => {
+    if (newProduct.nameEn && newProduct.price > 0) {
+      const product: Product = {
+        id: (products.length + 1).toString(),
+        nameEn: newProduct.nameEn,
+        nameCn: newProduct.nameCn || '',
+        nameRu: newProduct.nameRu || newProduct.nameEn,
+        price: newProduct.price,
+        sku: newProduct.sku || `SKU-${Date.now()}`,
+        quantity: newProduct.quantity || 0,
+        brand: newProduct.brand || '',
+        webLink: newProduct.webLink || '',
+        category: newProduct.category || 'Без категории',
+        images: ['/img/b9923599-1ff7-4529-bb51-c69743d2a5bf.jpg'],
+        currentImageIndex: 0,
+        description: newProduct.description || '',
+        descriptionEn: newProduct.descriptionEn || '',
+        descriptionCn: newProduct.descriptionCn || '',
+        tnved: newProduct.tnved || '',
+        material: newProduct.material || '',
+        purpose: newProduct.purpose || '',
+        forWhom: newProduct.forWhom || ''
+      };
+
+      setProducts(prev => [...prev, product]);
+      setNewProduct({
+        nameEn: '', nameCn: '', nameRu: '', price: 0, sku: '', quantity: 0,
+        brand: '', webLink: '', category: '', description: '', descriptionEn: '', descriptionCn: '',
+        tnved: '', material: '', purpose: '', forWhom: ''
+      });
+      setShowAddForm(false);
+    }
+  };
+
   const breadcrumb = getBreadcrumb();
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <MainHeader
+        language={language}
+        onLanguageChange={setLanguage}
+        showAddForm={showAddForm}
+        setShowAddForm={setShowAddForm}
+        newProduct={newProduct}
+        setNewProduct={setNewProduct}
+        allCategories={allCategories}
+        categories={categories}
+        translations={t}
+        onAddProduct={addProduct}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
+
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
