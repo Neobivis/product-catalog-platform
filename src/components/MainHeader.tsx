@@ -56,7 +56,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
 
   // Проверяем права на админку
   const canAccessAdmin = currentUser 
-    ? hasPermission(currentUser, 'admin', 'all') || hasPermission(currentUser, 'write', 'categories', language)
+    ? (hasPermission(currentUser, 'admin', 'all') || hasPermission(currentUser, 'write', 'categories', language)) && currentUser.role !== 'victor'
     : false;
 
   // Проверяем, нужно ли показывать переключатель языка
@@ -90,7 +90,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
             <Link to="/price-requests">
               <Button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 h-10 rounded-md font-medium flex items-center gap-2 shadow-sm">
                 <Icon name="MessageSquare" size={18} />
-                <span className="hidden sm:inline">Запрос цены</span>
+                <span className="hidden sm:inline">{t.priceRequestCategory || 'Запрос цены'}</span>
               </Button>
             </Link>
 

@@ -7,6 +7,8 @@ import PriceField from '@/components/PriceField';
 import MultiLanguageTextField from '@/components/MultiLanguageTextField';
 import MultipleCategorySelector from '@/components/MultipleCategorySelector';
 import { Product, Language, Category } from '@/types/product';
+import { canEditField } from '@/types/user';
+import { useUserManagement } from '@/hooks/useUserManagement';
 
 interface ProductCatalogProps {
   products: Product[];
@@ -66,6 +68,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
   onAdditionalCategoriesChange,
   onPriceRequest
 }) => {
+  const { authState } = useUserManagement();
   return (
     <div className="space-y-6">
       {products.map(product => (
@@ -158,6 +161,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                         editingField={editingField}
                         setEditingField={setEditingField}
                         onFieldEdit={onFieldEdit}
+                        disabled={!canEditField(authState.currentUser, 'nameEn')}
                       />
                     </div>
                   </div>
@@ -174,6 +178,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                         editingField={editingField}
                         setEditingField={setEditingField}
                         onFieldEdit={onFieldEdit}
+                        disabled={!canEditField(authState.currentUser, 'nameCn')}
                       />
                     </div>
                   </div>
@@ -190,6 +195,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                         editingField={editingField}
                         setEditingField={setEditingField}
                         onFieldEdit={onFieldEdit}
+                        disabled={!canEditField(authState.currentUser, 'nameRu')}
                       />
                     </div>
                   </div>
@@ -218,17 +224,21 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                     <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
                       <span className="font-semibold text-sm w-20">{t.priceField}</span>
                       <div className="flex-1">
-                        <PriceField
-                          productId={product.id}
-                          field="price"
-                          value={product.price}
-                          language={language}
-                          editingField={editingField}
-                          setEditingField={setEditingField}
-                          onFieldEdit={onFieldEdit}
-                        />
+                        {canEditField(authState.currentUser, 'price') ? (
+                          <PriceField
+                            productId={product.id}
+                            field="price"
+                            value={product.price}
+                            language={language}
+                            editingField={editingField}
+                            setEditingField={setEditingField}
+                            onFieldEdit={onFieldEdit}
+                          />
+                        ) : (
+                          <span className="text-gray-600">{product.price} ¥</span>
+                        )}
                       </div>
-                      {onPriceRequest && (
+                      {onPriceRequest && authState.currentUser && authState.currentUser.role !== 'victor' && (
                         <Button
                           size="sm"
                           variant={product.price === 0 ? "secondary" : "outline"}
@@ -256,6 +266,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           editingField={editingField}
                           setEditingField={setEditingField}
                           onFieldEdit={onFieldEdit}
+                          disabled={!canEditField(authState.currentUser, 'sku')}
                         />
                       </div>
                     </div>
@@ -267,6 +278,10 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           productId={product.id}
                           field="quantity"
                           value={product.quantity}
+                          editingField={editingField}
+                          setEditingField={setEditingField}
+                          onFieldEdit={onFieldEdit}
+                          disabled={!canEditField(authState.currentUser, 'quantity')}
                           type="number"
                           editingField={editingField}
                           setEditingField={setEditingField}
@@ -287,6 +302,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           editingField={editingField}
                           setEditingField={setEditingField}
                           onFieldEdit={onFieldEdit}
+                          disabled={!canEditField(authState.currentUser, 'brand')}
                         />
                       </div>
                     </div>
@@ -301,20 +317,27 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                           editingField={editingField}
                           setEditingField={setEditingField}
                           onFieldEdit={onFieldEdit}
+                          disabled={!canEditField(authState.currentUser, 'webLink')}
+                          value={product.webLink}
+                          editingField={editingField}
+                          setEditingField={setEditingField}
+                          onFieldEdit={onFieldEdit}
                         />
                       </div>
                     </div>
                     
-                    <div className="p-3 bg-white border rounded-lg">
-                      <MultipleCategorySelector
-                        categories={categories}
-                        primaryCategory={product.category}
-                        additionalCategories={product.additionalCategories || []}
-                        onPrimaryCategoryChange={(value) => onFieldEdit(product.id, 'category', value)}
-                        onAdditionalCategoriesChange={(categories) => onAdditionalCategoriesChange(product.id, categories)}
-                        translations={t}
-                      />
-                    </div>
+                    {authState.currentUser && authState.currentUser.role !== 'victor' && (
+                      <div className="p-3 bg-white border rounded-lg">
+                        <MultipleCategorySelector
+                          categories={categories}
+                          primaryCategory={product.category}
+                          additionalCategories={product.additionalCategories || []}
+                          onPrimaryCategoryChange={(value) => onFieldEdit(product.id, 'category', value)}
+                          onAdditionalCategoriesChange={(categories) => onAdditionalCategoriesChange(product.id, categories)}
+                          translations={t}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 
