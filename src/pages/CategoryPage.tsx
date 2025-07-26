@@ -8,6 +8,7 @@ import Pagination from '@/components/Pagination';
 import { useProductsData } from '@/hooks/useProductsData';
 import { useProductOperations } from '@/hooks/useProductOperations';
 import { Product, Category } from '@/types/product';
+import { getRussianFields } from '@/utils/productHelpers';
 
 const CategoryPage: React.FC = () => {
   const location = useLocation();
@@ -285,13 +286,19 @@ const CategoryPage: React.FC = () => {
         {currentProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
-              {currentProducts.map((product) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product}
-                  onUpdate={handleProductUpdate}
-                />
-              ))}
+              {currentProducts.map((product) => {
+                const russianFields = getRussianFields(product.category || '', product.nameEn || '');
+                return (
+                  <ProductCard 
+                    key={product.id} 
+                    product={{
+                      ...product,
+                      ...russianFields
+                    }}
+                    onUpdate={handleProductUpdate}
+                  />
+                );
+              })}
             </div>
 
             {/* Bottom Pagination */}
