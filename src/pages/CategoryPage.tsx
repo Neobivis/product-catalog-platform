@@ -77,40 +77,54 @@ const CategoryPage: React.FC = () => {
   const filterProductsByCategory = (categoryPath: string): Product[] => {
     const decodedPath = categoryPath.split('/').map(part => decodeURIComponent(part)).join('/');
     console.log('Filtering products for path:', decodedPath);
-    console.log('Available products:', products.map(p => ({ name: p.nameRu, category: p.category })));
+    console.log('Available products:', products.map(p => ({ name: p.nameRu, category: p.category, additionalCategories: p.additionalCategories })));
     
     const filtered = products.filter(product => {
-      const normalizedProductCategory = product.category.trim();
       const normalizedSearchPath = decodedPath.trim();
       
       // Extract the last part of the search path (leaf category)
       const searchPathParts = normalizedSearchPath.split('/');
       const leafCategory = searchPathParts[searchPathParts.length - 1];
       
-      // Check multiple matching strategies:
-      // 1. Exact match with full path
-      const fullPathMatch = normalizedProductCategory === normalizedSearchPath;
+      // Helper function to check if a category matches
+      const checkCategoryMatch = (categoryToCheck: string) => {
+        const normalizedCategory = categoryToCheck.trim();
+        
+        // 1. Exact match with full path
+        const fullPathMatch = normalizedCategory === normalizedSearchPath;
+        
+        // 2. Product category starts with search path
+        const startsWithMatch = normalizedCategory.startsWith(normalizedSearchPath);
+        
+        // 3. Product category ends with leaf category (for backwards compatibility)
+        const leafMatch = normalizedCategory === leafCategory || 
+                         normalizedCategory.endsWith('/' + leafCategory);
+        
+        return fullPathMatch || startsWithMatch || leafMatch;
+      };
       
-      // 2. Product category starts with search path
-      const startsWithMatch = normalizedProductCategory.startsWith(normalizedSearchPath);
+      // Check primary category
+      const primaryMatches = checkCategoryMatch(product.category);
       
-      // 3. Product category ends with leaf category (for backwards compatibility)
-      const leafMatch = normalizedProductCategory === leafCategory || 
-                       normalizedProductCategory.endsWith('/' + leafCategory);
+      // Check additional categories
+      const additionalMatches = product.additionalCategories && 
+        product.additionalCategories.some(addCat => checkCategoryMatch(addCat));
       
-      const matches = fullPathMatch || startsWithMatch || leafMatch;
+      const matches = primaryMatches || additionalMatches;
       
-      console.log(`Comparing "${normalizedProductCategory}" with "${normalizedSearchPath}":`, {
-        fullPathMatch,
-        startsWithMatch, 
-        leafMatch,
+      console.log(`Checking product "${product.nameRu}":`, {
+        primaryCategory: product.category,
+        additionalCategories: product.additionalCategories,
+        searchPath: normalizedSearchPath,
+        primaryMatches,
+        additionalMatches,
         matches
       });
       
       return matches;
     });
     
-    console.log('Filtered products:', filtered.map(p => ({ name: p.nameRu, category: p.category })));
+    console.log('Filtered products:', filtered.map(p => ({ name: p.nameRu, category: p.category, additionalCategories: p.additionalCategories })));
     return filtered;
   };
 
@@ -227,6 +241,14 @@ const CategoryPage: React.FC = () => {
       p.id === updatedProduct.id ? updatedProduct : p
     );
     setProducts(updatedProducts);
+  };
+
+  const handleAdditionalCategoriesChange = (productId: string, additionalCategories: string[]) => {
+    setProducts(prev => prev.map(product => 
+      product.id === productId 
+        ? { ...product, additionalCategories }
+        : product
+    ));
   };
 
   // Get all unique categories for form
@@ -383,6 +405,7 @@ const CategoryPage: React.FC = () => {
               onImageNavigation={handleImageNavigation}
               onShowImageManager={setShowImageManager}
               onImageClick={setSelectedProduct}
+              onAdditionalCategoriesChange={handleAdditionalCategoriesChange}
             />
 
             {/* Bottom Pagination */}
