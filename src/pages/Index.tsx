@@ -13,7 +13,7 @@ const Index = () => {
   const t = translations[language];
   
   // Get data and operations from custom hooks
-  const { products, setProducts, categories } = useProductsData();
+  const { products, setProducts, categories, setCategories } = useProductsData();
   
   const {
     editingField,
@@ -119,6 +119,33 @@ const Index = () => {
     }
   };
 
+  const handleUpdateCategories = (newCategories: Category[]) => {
+    setCategories(newCategories);
+    
+    // Check if any products have categories that no longer exist
+    const getAllCategoryPaths = (cats: Category[], path: string[] = []): string[] => {
+      const paths: string[] = [];
+      cats.forEach(cat => {
+        const currentPath = [...path, cat.name].join('/');
+        paths.push(currentPath);
+        if (cat.children) {
+          paths.push(...getAllCategoryPaths(cat.children, [...path, cat.name]));
+        }
+      });
+      return paths;
+    };
+
+    const validCategoryPaths = getAllCategoryPaths(newCategories);
+    
+    // Move products with invalid categories to "Без категории"
+    setProducts(prev => prev.map(product => {
+      if (product.category && !validCategoryPaths.includes(product.category)) {
+        return { ...product, category: 'Без категории' };
+      }
+      return product;
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <MainHeader
@@ -164,6 +191,7 @@ const Index = () => {
         onAddImageByUrl={addImageByUrl}
         onRemoveImage={removeImageFromProduct}
         onSetCurrentImage={setCurrentImage}
+        onUpdateCategories={handleUpdateCategories}
       />
     </div>
   );

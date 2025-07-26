@@ -5,10 +5,12 @@ import Icon from '@/components/ui/icon';
 import EditableField from '@/components/EditableField';
 import PriceField from '@/components/PriceField';
 import MultiLanguageTextField from '@/components/MultiLanguageTextField';
-import { Product, Language } from '@/types/product';
+import CategorySelector from '@/components/CategorySelector';
+import { Product, Language, Category } from '@/types/product';
 
 interface ProductCatalogProps {
   products: Product[];
+  categories: Category[];
   language: Language;
   translations: any;
   editingField: {productId: string, field: string} | null;
@@ -50,6 +52,7 @@ const FlagIcon: React.FC<{ country: 'us' | 'cn' | 'ru' }> = ({ country }) => {
 
 const ProductCatalog: React.FC<ProductCatalogProps> = ({
   products,
+  categories,
   language,
   translations: t,
   editingField,
@@ -285,13 +288,11 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                     <div className="flex items-center gap-3 p-3 bg-white border rounded-lg">
                       <span className="font-semibold text-sm w-20">{t.categoryField}</span>
                       <div className="flex-1">
-                        <EditableField
-                          productId={product.id}
-                          field="category"
+                        <CategorySelector
+                          categories={categories}
                           value={product.category}
-                          editingField={editingField}
-                          setEditingField={setEditingField}
-                          onFieldEdit={onFieldEdit}
+                          onChange={(value) => onFieldEdit(product.id, 'category', value)}
+                          placeholder="Выберите категорию"
                         />
                       </div>
                     </div>

@@ -69,7 +69,12 @@ export const useProductsData = () => {
     }
   ]);
 
-  const [categories] = useState<Category[]>([
+  const [categories, setCategories] = useState<Category[]>([
+    {
+      id: 'uncategorized',
+      name: 'Без категории',
+      icon: 'HelpCircle'
+    },
     {
       id: 'electronics',
       name: 'Электроника',
@@ -122,6 +127,7 @@ export const useProductsData = () => {
   return {
     products,
     setProducts,
-    categories
+    categories,
+    setCategories
   };
 };

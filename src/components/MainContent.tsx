@@ -5,6 +5,7 @@ import SearchAndFilters from '@/components/SearchAndFilters';
 import ProductCatalog from '@/components/ProductCatalog';
 import ImageManager from '@/components/ImageManager';
 import ImageModal from '@/components/ImageModal';
+import CategoryManager from '@/components/CategoryManager';
 
 interface MainContentProps {
   activeTab: string;
@@ -34,6 +35,7 @@ interface MainContentProps {
   onAddImageByUrl: (productId: string) => void;
   onRemoveImage: (productId: string, imageIndex: number) => void;
   onSetCurrentImage: (productId: string, index: number) => void;
+  onUpdateCategories: (categories: Category[]) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -63,7 +65,8 @@ const MainContent: React.FC<MainContentProps> = ({
   onFileUpload,
   onAddImageByUrl,
   onRemoveImage,
-  onSetCurrentImage
+  onSetCurrentImage,
+  onUpdateCategories
 }) => {
   const [modalProduct, setModalProduct] = useState<Product | null>(null);
 
@@ -121,6 +124,7 @@ const MainContent: React.FC<MainContentProps> = ({
       {activeTab === 'catalog' && (
         <ProductCatalog
           products={products}
+          categories={categories}
           language={language}
           translations={t}
           editingField={editingField}
@@ -132,7 +136,16 @@ const MainContent: React.FC<MainContentProps> = ({
         />
       )}
 
-      {(activeTab === 'favorites' || activeTab === 'admin') && (
+      {/* Admin Tab */}
+      {activeTab === 'admin' && (
+        <CategoryManager
+          categories={categories}
+          onUpdateCategories={onUpdateCategories}
+          translations={t}
+        />
+      )}
+
+      {activeTab === 'favorites' && (
         <div className="text-center py-12">
           <Icon name="Construction" size={48} className="mx-auto mb-4 text-gray-400" />
           <h3 className="text-lg font-semibold text-gray-600 mb-2">{t.inDevelopment}</h3>
