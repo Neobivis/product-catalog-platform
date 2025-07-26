@@ -3,12 +3,14 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
-import ProductCard from '@/components/ProductCard';
+import ProductCatalog from '@/components/ProductCatalog';
 import Pagination from '@/components/Pagination';
+import ImageModal from '@/components/ImageModal';
 import { useProductsData } from '@/hooks/useProductsData';
 import { useProductOperations } from '@/hooks/useProductOperations';
-import { Product, Category } from '@/types/product';
+import { Product, Category, Language } from '@/types/product';
 import { getRussianFields } from '@/utils/productHelpers';
+import { translations } from '@/utils/translations';
 
 const CategoryPage: React.FC = () => {
   const location = useLocation();
@@ -22,12 +24,29 @@ const CategoryPage: React.FC = () => {
   
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [language, setLanguage] = useState<Language>('ru');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   // Get data from hook
   const { products, setProducts, categories } = useProductsData();
   
   // Get product operations for editing
-  const { handleFieldEdit } = useProductOperations(products, setProducts);
+  const {
+    editingField,
+    setEditingField,
+    showImageManager,
+    setShowImageManager,
+    newImageUrl,
+    setNewImageUrl,
+    handleFieldEdit,
+    handleImageNavigation,
+    handleFileUpload,
+    addImageByUrl,
+    removeImageFromProduct,
+    setCurrentImage
+  } = useProductOperations(products, setProducts);
+  
+  const t = translations[language];
 
   // Find category by path
   const findCategoryByPath = (cats: Category[], path: string): Category | null => {
@@ -285,21 +304,24 @@ const CategoryPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {currentProducts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
-              {currentProducts.map((product) => {
+            <ProductCatalog
+              products={currentProducts.map(product => {
                 const russianFields = getRussianFields(product.category || '', product.nameEn || '');
-                return (
-                  <ProductCard 
-                    key={product.id} 
-                    product={{
-                      ...product,
-                      ...russianFields
-                    }}
-                    onUpdate={handleProductUpdate}
-                  />
-                );
+                return {
+                  ...product,
+                  ...russianFields
+                };
               })}
-            </div>
+              categories={categories}
+              language={language}
+              translations={t}
+              editingField={editingField}
+              setEditingField={setEditingField}
+              onFieldEdit={handleFieldEdit}
+              onImageNavigation={handleImageNavigation}
+              onShowImageManager={setShowImageManager}
+              onImageClick={setSelectedProduct}
+            />
 
             {/* Bottom Pagination */}
             {totalPages > 1 && (
@@ -325,6 +347,16 @@ const CategoryPage: React.FC = () => {
               Вернуться назад
             </Button>
           </div>
+        )}
+        
+        {/* Image Modal */}
+        {selectedProduct && (
+          <ImageModal
+            product={selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+            onPrevImage={() => handleImageNavigation(selectedProduct.id, 'prev')}
+            onNextImage={() => handleImageNavigation(selectedProduct.id, 'next')}
+          />
         )}
       </div>
     </div>
