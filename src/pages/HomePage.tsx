@@ -6,7 +6,6 @@ import Pagination from '@/components/Pagination';
 import MainHeader from '@/components/MainHeader';
 import { useProductsData } from '@/hooks/useProductsData';
 import { useProductOperations } from '@/hooks/useProductOperations';
-import { useFilters } from '@/hooks/useFilters';
 import { Product, Language } from '@/types/product';
 import { translations } from '@/utils/translations';
 import { getRussianFields } from '@/utils/productHelpers';
@@ -17,6 +16,15 @@ const HomePage: React.FC = () => {
   
   const currentPage = parseInt(searchParams.get('page') || '1');
   const itemsPerPage = parseInt(searchParams.get('limit') || '25');
+  
+  // Local state for MainHeader
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    nameEn: '', nameCn: '', nameRu: '', price: 0, sku: '', quantity: 0,
+    brand: '', webLink: '', category: '', description: '', descriptionEn: '', descriptionCn: '',
+    tnved: '', material: '', purpose: '', forWhom: ''
+  });
+  const [activeTab, setActiveTab] = useState('catalog');
   
   const t = translations[language];
   
@@ -37,25 +45,6 @@ const HomePage: React.FC = () => {
     removeImageFromProduct,
     setCurrentImage
   } = useProductOperations(products, setProducts);
-
-  const {
-    showAddForm,
-    setShowAddForm,
-    newProduct,
-    setNewProduct,
-    activeTab,
-    setActiveTab,
-    searchTerm,
-    setSearchTerm,
-    sortBy,
-    setSortBy,
-    filterCategory,
-    setFilterCategory,
-    priceRange,
-    setPriceRange,
-    showFilters,
-    setShowFilters
-  } = useFilters();
 
   // Sort products by creation date (newest first) - simulate with reverse order
   const sortedProducts = useMemo(() => {
