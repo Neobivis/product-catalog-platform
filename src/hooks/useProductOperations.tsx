@@ -1,43 +1,17 @@
 import { useState } from 'react';
 import { Product } from '@/types/product';
-import { useUserManagement } from '@/hooks/useUserManagement';
 
 export const useProductOperations = (products: Product[], setProducts: React.Dispatch<React.SetStateAction<Product[]>>) => {
-  const { authState } = useUserManagement();
   const [editingField, setEditingField] = useState<{productId: string, field: string} | null>(null);
   const [showImageManager, setShowImageManager] = useState<string | null>(null);
   const [newImageUrl, setNewImageUrl] = useState('');
 
   const handleFieldEdit = (productId: string, field: string, value: string | number) => {
-    setProducts(prev => prev.map(product => {
-      if (product.id === productId) {
-        const updatedProduct = { 
-          ...product, 
-          [field]: field === 'price' || field === 'quantity' ? Number(value) : value 
-        };
-        
-        // Если Victor сохраняет цену и она больше 0, исключаем товар из категории "Запрос цены"
-        if (authState.currentUser?.role === 'victor' && field === 'price' && Number(value) > 0) {
-          const updatedAdditionalCategories = (updatedProduct.additionalCategories || [])
-            .filter(cat => cat !== 'Запрос цены');
-          
-          // Если основная категория "Запрос цены", меняем её на первую доступную дополнительную категорию
-          let newCategory = updatedProduct.category;
-          if (updatedProduct.category === 'Запрос цены') {
-            newCategory = updatedAdditionalCategories.length > 0 ? updatedAdditionalCategories[0] : '';
-          }
-          
-          return {
-            ...updatedProduct,
-            category: newCategory,
-            additionalCategories: updatedAdditionalCategories
-          };
-        }
-        
-        return updatedProduct;
-      }
-      return product;
-    }));
+    setProducts(prev => prev.map(product => 
+      product.id === productId 
+        ? { ...product, [field]: field === 'price' || field === 'quantity' ? Number(value) : value }
+        : product
+    ));
     
     // Only close editing field for non-translation fields
     if (!field.endsWith('En') && !field.endsWith('Cn')) {

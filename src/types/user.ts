@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'editor' | 'viewer' | 'chinese_only' | 'victor';
+export type UserRole = 'admin' | 'editor' | 'viewer' | 'chinese_only';
 
 export interface User {
   id: string;
@@ -43,10 +43,6 @@ export const rolePermissions: Record<UserRole, Permission[]> = {
     { action: 'read', resource: 'all', language: 'cn' },
     { action: 'write', resource: 'products', language: 'cn' },
     { action: 'write', resource: 'categories', language: 'cn' }
-  ],
-  victor: [
-    { action: 'read', resource: 'all' },
-    { action: 'write', resource: 'products' } // Ограниченное редактирование только определенных полей
   ]
 };
 
@@ -76,28 +72,4 @@ export const hasPermission = (
 // Проверка доступа гостей (только чтение)
 export const isGuestAllowed = (action: Permission['action']): boolean => {
   return action === 'read';
-};
-
-// Проверка доступа к редактированию конкретного поля для пользователя Victor
-export const canVictorEditField = (fieldName: string): boolean => {
-  const allowedFields = ['price', 'brand', 'nameCn'];
-  return allowedFields.includes(fieldName);
-};
-
-// Проверка может ли пользователь редактировать конкретное поле
-export const canEditField = (user: User | null, fieldName: string): boolean => {
-  if (!user || !user.isActive) return false;
-  
-  // Администратор может редактировать все поля
-  if (user.permissions.some(p => p.action === 'admin' && p.resource === 'all')) {
-    return true;
-  }
-  
-  // Пользователь Victor может редактировать только определенные поля
-  if (user.role === 'victor') {
-    return canVictorEditField(fieldName);
-  }
-  
-  // Остальные пользователи с правами на запись могут редактировать все поля
-  return hasPermission(user, 'write', 'products');
 };
