@@ -176,6 +176,20 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
+        {/* Top Pagination */}
+        {totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+            <div className="text-sm text-gray-600">
+              Показано {((currentPage - 1) * itemsPerPage) + 1}–{Math.min(currentPage * itemsPerPage, sortedProducts.length)} из {sortedProducts.length} товаров
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
+
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
           {paginatedProducts.map((product) => {
@@ -202,18 +216,11 @@ const HomePage: React.FC = () => {
           </div>
         )}
 
-        {/* Debug Info */}
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
-          <div>Товаров: {sortedProducts.length}</div>
-          <div>На странице: {itemsPerPage}</div>
-          <div>Текущая страница: {currentPage}</div>
-          <div>Всего страниц: {totalPages}</div>
-          <div>Показано товаров: {paginatedProducts.length}</div>
-        </div>
 
-        {/* Pagination */}
+
+        {/* Bottom Pagination */}
         {totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8">
             <div className="text-sm text-gray-600">
               Показано {((currentPage - 1) * itemsPerPage) + 1}–{Math.min(currentPage * itemsPerPage, sortedProducts.length)} из {sortedProducts.length} товаров
             </div>
@@ -224,16 +231,7 @@ const HomePage: React.FC = () => {
             />
           </div>
         )}
-        
-        {/* Always show pagination for testing */}
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
-          <div className="text-sm text-blue-700 mb-2">Принудительная пагинация (для тестирования):</div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={Math.max(2, totalPages)} 
-            onPageChange={handlePageChange}
-          />
-        </div>
+
       </main>
     </div>
   );
