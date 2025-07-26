@@ -45,8 +45,8 @@ const MainHeader: React.FC<MainHeaderProps> = ({
             <Link to="/" className="flex-shrink-0 hover:opacity-80 transition-opacity">
               <img 
                 src="/img/logo.svg" 
-                alt="Логотип" 
-                className="w-10 h-10"
+                alt="Логотип poehali.dev" 
+                className="h-8 w-auto max-w-[120px]"
                 onError={(e) => {
                   // Fallback to text logo if SVG fails to load
                   const target = e.target as HTMLImageElement;
