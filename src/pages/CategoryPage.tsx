@@ -47,14 +47,33 @@ const CategoryPage: React.FC = () => {
     console.log('Available products:', products.map(p => ({ name: p.nameRu, category: p.category })));
     
     const filtered = products.filter(product => {
-      // Normalize both category paths for comparison
       const normalizedProductCategory = product.category.trim();
       const normalizedSearchPath = decodedPath.trim();
       
-      // Check if product category starts with the search path
-      const matches = normalizedProductCategory.startsWith(normalizedSearchPath);
+      // Extract the last part of the search path (leaf category)
+      const searchPathParts = normalizedSearchPath.split('/');
+      const leafCategory = searchPathParts[searchPathParts.length - 1];
       
-      console.log(`Comparing "${normalizedProductCategory}" with "${normalizedSearchPath}": ${matches}`);
+      // Check multiple matching strategies:
+      // 1. Exact match with full path
+      const fullPathMatch = normalizedProductCategory === normalizedSearchPath;
+      
+      // 2. Product category starts with search path
+      const startsWithMatch = normalizedProductCategory.startsWith(normalizedSearchPath);
+      
+      // 3. Product category ends with leaf category (for backwards compatibility)
+      const leafMatch = normalizedProductCategory === leafCategory || 
+                       normalizedProductCategory.endsWith('/' + leafCategory);
+      
+      const matches = fullPathMatch || startsWithMatch || leafMatch;
+      
+      console.log(`Comparing "${normalizedProductCategory}" with "${normalizedSearchPath}":`, {
+        fullPathMatch,
+        startsWithMatch, 
+        leafMatch,
+        matches
+      });
+      
       return matches;
     });
     
