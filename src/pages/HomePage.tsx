@@ -53,9 +53,12 @@ const HomePage: React.FC = () => {
     setProducts(updatedProducts);
   };
 
-  // Sort products by creation date (newest first) - simulate with reverse order
+  // Sort products by creation date (newest first) - use ID as proxy for creation order
   const sortedProducts = useMemo(() => {
-    return [...products].reverse();
+    return [...products].sort((a, b) => {
+      // Assuming higher ID means more recent (last created)
+      return (b.id || 0) - (a.id || 0);
+    });
   }, [products]);
 
   // Paginate products
@@ -145,7 +148,7 @@ const HomePage: React.FC = () => {
             Последние товары
           </h1>
           <p className="text-gray-600">
-            Показаны {paginatedProducts.length} из {sortedProducts.length} товаров
+            Показаны {paginatedProducts.length} из {sortedProducts.length} товаров (отсортированы по дате создания)
           </p>
         </div>
 
@@ -201,7 +204,10 @@ const HomePage: React.FC = () => {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="text-sm text-gray-600">
+              Показано {((currentPage - 1) * itemsPerPage) + 1}–{Math.min(currentPage * itemsPerPage, sortedProducts.length)} из {sortedProducts.length} товаров
+            </div>
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
