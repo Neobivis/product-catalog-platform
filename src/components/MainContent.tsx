@@ -68,7 +68,8 @@ const MainContent: React.FC<MainContentProps> = ({
   onAddImageByUrl,
   onRemoveImage,
   onSetCurrentImage,
-  onUpdateCategories
+  onUpdateCategories,
+  onAdditionalCategoriesChange
 }) => {
   const [modalProduct, setModalProduct] = useState<Product | null>(null);
 
