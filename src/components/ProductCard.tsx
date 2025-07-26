@@ -9,9 +9,9 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ru-RU', {
+    return new Intl.NumberFormat('zh-CN', {
       style: 'currency',
-      currency: 'RUB',
+      currency: 'CNY',
       minimumFractionDigits: 0
     }).format(price);
   };
