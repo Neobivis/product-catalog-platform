@@ -225,6 +225,29 @@ const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }
               }`}
             >
               <div className="flex-1 overflow-y-auto">
+                {/* Main Catalog Link - Show only at root level */}
+                {breadcrumb.length === 0 && (
+                  <div
+                    className="flex items-center justify-between px-4 py-3 cursor-pointer transition-colors hover:bg-blue-50 border-b border-gray-100 bg-blue-25"
+                    onClick={() => {
+                      navigate('/');
+                      setIsOpen(false);
+                      setCurrentCategories(categories);
+                      setBreadcrumb([]);
+                    }}
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Icon 
+                        name="Home" 
+                        size={18} 
+                        className="text-blue-600 flex-shrink-0" 
+                      />
+                      <span className="text-sm font-semibold text-blue-700">Главная страница каталога</span>
+                    </div>
+                    <Icon name="ExternalLink" size={16} className="text-blue-400" />
+                  </div>
+                )}
+                
                 {currentCategories.length > 0 ? (
                   renderCategories()
                 ) : (
