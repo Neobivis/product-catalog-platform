@@ -42,8 +42,15 @@ export const useProductsData = () => {
   useEffect(() => {
     const savedProducts = loadProductsFromStorage();
     if (!savedProducts || savedProducts.length === 0) {
-      setProducts(defaultProducts);
-      saveProductsToStorage(defaultProducts);
+      // Создаем копию defaultProducts с несколькими товарами с нулевой ценой
+      const productsWithZeroPrices = defaultProducts.map((product, index) => {
+        if (index < 5) {
+          return { ...product, price: 0 };
+        }
+        return product;
+      });
+      setProducts(productsWithZeroPrices);
+      saveProductsToStorage(productsWithZeroPrices);
     }
     
     const savedCategories = loadCategoriesFromStorage();

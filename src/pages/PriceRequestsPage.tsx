@@ -7,7 +7,7 @@ import { useProductOperations } from '@/hooks/useProductOperations';
 import { getRussianFields } from '@/utils/productHelpers';
 import { hasPermission } from '@/types/user';
 import { useUserManagement } from '@/hooks/useUserManagement';
-import { ensureDataForVictor, ensurePriceRequestProducts } from '@/utils/victorDataSync';
+import { ensureDataForVictor, ensurePriceRequestProducts, ensureZeroPriceProducts } from '@/utils/victorDataSync';
 import MainHeader from '@/components/MainHeader';
 import ProductCatalog from '@/components/ProductCatalog';
 import AuthModal from '@/components/AuthModal';
@@ -65,8 +65,9 @@ const PriceRequestsPage: React.FC<PriceRequestsPageProps> = ({ forceLanguage }) 
         setCategories(defaultCategories);
       }
       
-      // Убеждаемся что есть товары для запроса цены
+      // Убеждаемся что есть товары с нулевой ценой для Victor
       ensurePriceRequestProducts();
+      ensureZeroPriceProducts();
     }
   }, [authState.currentUser, products.length, categories.length, setProducts, setCategories]);
   
@@ -87,6 +88,12 @@ const PriceRequestsPage: React.FC<PriceRequestsPageProps> = ({ forceLanguage }) 
 
   // Фильтрация товаров с запросом цены
   const priceRequestProducts = products.filter(product => {
+    // Для пользователя Victor показываем только товары с нулевой ценой
+    if (authState.currentUser?.role === 'victor') {
+      return product.price === 0;
+    }
+    
+    // Для других пользователей - стандартная фильтрация по категории
     // Проверяем основную категорию
     if (product.category === 'Запрос цены') {
       return true;

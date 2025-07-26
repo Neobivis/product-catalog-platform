@@ -15,7 +15,16 @@ export const ensureDataForVictor = (): { products: Product[], categories: Catego
   
   // Если данных нет в localStorage, используем defaultProducts
   if (!products || products.length === 0) {
-    products = defaultProducts;
+    // Создаем копию defaultProducts и делаем первые 5 товаров с нулевой ценой
+    products = defaultProducts.map((product, index) => {
+      if (index < 5) {
+        return {
+          ...product,
+          price: 0
+        };
+      }
+      return product;
+    });
     saveProductsToStorage(products);
   }
   
@@ -27,29 +36,54 @@ export const ensureDataForVictor = (): { products: Product[], categories: Catego
   return { products, categories };
 };
 
-// Проверяет и добавляет товары в категорию "Запрос цены" если их нет
+// Проверяет что есть достаточно товаров с нулевой ценой для Victor
 export const ensurePriceRequestProducts = (): void => {
   const { products } = ensureDataForVictor();
   
-  // Проверяем есть ли товары в категории "Запрос цены"
-  const priceRequestProducts = products.filter(product => 
-    product.category === 'Запрос цены' || 
-    (product.additionalCategories && product.additionalCategories.includes('Запрос цены'))
-  );
+  // Проверяем есть ли товары с нулевой ценой для Victor
+  const zeroProducts = products.filter(product => product.price === 0);
   
-  // Если товаров для запроса цены нет, добавляем несколько товаров в эту категорию
-  if (priceRequestProducts.length === 0) {
+  // Если товаров с нулевой ценой меньше 3, создаем еще
+  if (zeroProducts.length < 3) {
     const updatedProducts = products.map((product, index) => {
-      // Добавляем первые 5 товаров в категорию "Запрос цены"
+      // Делаем первые 5 товаров с нулевой ценой для Victor
       if (index < 5) {
         return {
           ...product,
-          additionalCategories: [...(product.additionalCategories || []), 'Запрос цены']
+          price: 0
         };
       }
       return product;
     });
     
     saveProductsToStorage(updatedProducts);
+  }
+};
+
+// Создает дополнительные товары с нулевой ценой если их мало
+export const ensureZeroPriceProducts = (): void => {
+  const { products } = ensureDataForVictor();
+  
+  // Подсчитываем товары с нулевой ценой
+  const zeroProducts = products.filter(product => product.price === 0);
+  
+  // Если товаров с нулевой ценой меньше 3, добавляем еще
+  if (zeroProducts.length < 3) {
+    const productsWithPrice = products.filter(product => product.price > 0);
+    
+    if (productsWithPrice.length > 0) {
+      const updatedProducts = products.map((product, index) => {
+        // Если товар имеет цену и нам нужно больше товаров с нулевой ценой
+        if (product.price > 0 && zeroProducts.length + index < 3) {
+          return {
+            ...product,
+            price: 0
+          };
+        }
+        return product;
+      });
+      
+      saveProductsToStorage(updatedProducts);
+    }
   }
 };
