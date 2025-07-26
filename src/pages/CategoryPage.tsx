@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -6,6 +6,7 @@ import Icon from '@/components/ui/icon';
 import ProductCard from '@/components/ProductCard';
 import Pagination from '@/components/Pagination';
 import { useProductsData } from '@/hooks/useProductsData';
+import { useProductOperations } from '@/hooks/useProductOperations';
 import { Product, Category } from '@/types/product';
 
 const CategoryPage: React.FC = () => {
@@ -18,12 +19,14 @@ const CategoryPage: React.FC = () => {
   const currentPage = parseInt(searchParams.get('page') || '1');
   const itemsPerPage = parseInt(searchParams.get('limit') || '25');
   
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   // Get data from hook
-  const { products, categories } = useProductsData();
+  const { products, setProducts, categories } = useProductsData();
+  
+  // Get product operations for editing
+  const { handleFieldEdit } = useProductOperations(products, setProducts);
 
   // Find category by path
   const findCategoryByPath = (cats: Category[], path: string): Category | null => {
@@ -107,6 +110,20 @@ const CategoryPage: React.FC = () => {
     return breadcrumb;
   };
 
+  // Filter and sort products
+  const filteredProducts = useMemo(() => {
+    if (!categoryPath) return [];
+    return filterProductsByCategory(categoryPath);
+  }, [products, categoryPath]);
+
+  // Sort products by creation date (newest first) - use ID as proxy for creation order
+  const sortedProducts = useMemo(() => {
+    return [...filteredProducts].sort((a, b) => {
+      // Assuming higher ID means more recent (last created)
+      return (b.id || 0) - (a.id || 0);
+    });
+  }, [filteredProducts]);
+
   useEffect(() => {
     if (!categoryPath) {
       setIsLoading(false);
@@ -116,11 +133,9 @@ const CategoryPage: React.FC = () => {
     const category = findCategoryByPath(categories, categoryPath);
     if (category) {
       setCurrentCategory(category);
-      const filteredProds = filterProductsByCategory(categoryPath);
-      setFilteredProducts(filteredProds);
     }
     setIsLoading(false);
-  }, [categoryPath]);
+  }, [categoryPath, categories]);
 
   const handlePageChange = (page: number) => {
     const newParams = new URLSearchParams(searchParams);
@@ -171,11 +186,18 @@ const CategoryPage: React.FC = () => {
   }
 
   // Pagination calculations
-  const totalProducts = filteredProducts.length;
+  const totalProducts = sortedProducts.length;
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  const currentProducts = sortedProducts.slice(startIndex, endIndex);
+
+  const handleProductUpdate = (updatedProduct: Product) => {
+    const updatedProducts = products.map(p => 
+      p.id === updatedProduct.id ? updatedProduct : p
+    );
+    setProducts(updatedProducts);
+  };
 
   const breadcrumb = getBreadcrumb();
 
@@ -213,17 +235,17 @@ const CategoryPage: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{currentCategory.name}</h1>
               <p className="text-gray-600 mt-1">
-                Найдено {totalProducts} товар{totalProducts === 1 ? '' : totalProducts < 5 ? 'а' : 'ов'}
+                Показано {currentProducts.length} из {totalProducts} товаров (отсортированы по дате создания)
               </p>
             </div>
           </div>
 
-          {/* Filters and Controls */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Показывать по:</span>
+          {/* Controls */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-700">Показывать по:</span>
               <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                <SelectTrigger className="w-20">
+                <SelectTrigger className="w-24">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -233,14 +255,28 @@ const CategoryPage: React.FC = () => {
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
+              <span className="text-sm text-gray-700">товаров</span>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>
-                Показано {startIndex + 1}-{Math.min(endIndex, totalProducts)} из {totalProducts}
-              </span>
+            {/* Pagination Info */}
+            <div className="text-sm text-gray-600">
+              Страница {currentPage} из {totalPages}
             </div>
           </div>
+
+          {/* Top Pagination */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+              <div className="text-sm text-gray-600">
+                Показано {((currentPage - 1) * itemsPerPage) + 1}–{Math.min(currentPage * itemsPerPage, totalProducts)} из {totalProducts} товаров
+              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -250,13 +286,20 @@ const CategoryPage: React.FC = () => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
               {currentProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard 
+                  key={product.id} 
+                  product={product}
+                  onUpdate={handleProductUpdate}
+                />
               ))}
             </div>
 
-            {/* Pagination */}
+            {/* Bottom Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8">
+                <div className="text-sm text-gray-600">
+                  Показано {((currentPage - 1) * itemsPerPage) + 1}–{Math.min(currentPage * itemsPerPage, totalProducts)} из {totalProducts} товаров
+                </div>
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
