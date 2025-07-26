@@ -102,6 +102,21 @@ const MainHeader: React.FC<MainHeaderProps> = ({
               );
             }
             
+            if (tab.id === 'admin') {
+              return (
+                <Link key={tab.id} to="/admin">
+                  <Button
+                    variant={"ghost"}
+                    size="sm"
+                    className="flex items-center gap-1 lg:gap-2 text-xs lg:text-sm"
+                  >
+                    <Icon name={tab.icon} size={14} />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </Button>
+                </Link>
+              );
+            }
+            
             return (
               <Button
                 key={tab.id}
