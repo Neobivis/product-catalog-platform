@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Product, Language } from '@/types/product';
 import { translations } from '@/utils/translations';
 import { useProductsData } from '@/hooks/useProductsData';
@@ -23,6 +24,7 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
   });
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { authState, logout } = useUserManagement();
+  const navigate = useNavigate();
   
   const t = translations[language];
 
@@ -39,6 +41,13 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
       setLanguage('cn');
     }
   }, [authState.currentUser, forceLanguage]);
+
+  // Автоматический переход Victor в раздел "Запрос цены"
+  useEffect(() => {
+    if (authState.currentUser?.role === 'victor' && !forceLanguage) {
+      navigate('/price-requests');
+    }
+  }, [authState.currentUser, navigate, forceLanguage]);
 
   // Показываем модальное окно авторизации при первом запуске (если не гость)
   useEffect(() => {
