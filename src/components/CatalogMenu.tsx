@@ -153,7 +153,8 @@ const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }
           {/* Menu */}
           <div 
             ref={menuRef}
-            className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-xl z-50 w-80 max-h-96 overflow-hidden"
+            className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-xl z-50 w-80 overflow-hidden flex flex-col"
+            style={{ maxHeight: 'min(75vh, 600px)' }}
           >
             {/* Header with Navigation */}
             <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
@@ -215,7 +216,7 @@ const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }
                 isAnimating ? 'opacity-50 transform translate-x-2' : 'opacity-100 transform translate-x-0'
               }`}
             >
-              <div className="max-h-64 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto">
                 {currentCategories.length > 0 ? (
                   renderCategories()
                 ) : (
