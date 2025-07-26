@@ -294,7 +294,7 @@ const PriceRequestsPage: React.FC<PriceRequestsPageProps> = ({ forceLanguage }) 
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
-          translations={t}
+          language={language}
         />
       )}
     </div>
