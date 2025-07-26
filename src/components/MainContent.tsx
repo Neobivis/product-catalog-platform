@@ -6,6 +6,7 @@ import ProductCatalog from '@/components/ProductCatalog';
 import ImageManager from '@/components/ImageManager';
 import ImageModal from '@/components/ImageModal';
 import CategoryManager from '@/components/CategoryManager';
+import UserManagement from '@/components/UserManagement';
 
 interface MainContentProps {
   activeTab: string;
@@ -138,11 +139,20 @@ const MainContent: React.FC<MainContentProps> = ({
 
       {/* Admin Tab */}
       {activeTab === 'admin' && (
-        <CategoryManager
-          categories={categories}
-          onUpdateCategories={onUpdateCategories}
-          translations={t}
-        />
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">{t.categoryManagement || 'Управление категориями'}</h2>
+            <CategoryManager
+              categories={categories}
+              onUpdateCategories={onUpdateCategories}
+              translations={t}
+            />
+          </div>
+          
+          <div>
+            <UserManagement language={language} />
+          </div>
+        </div>
       )}
 
       {activeTab === 'favorites' && (

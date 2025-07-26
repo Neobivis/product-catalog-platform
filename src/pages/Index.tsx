@@ -1,16 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Product, Language } from '@/types/product';
 import { translations } from '@/utils/translations';
 import { useProductsData } from '@/hooks/useProductsData';
 import { useProductOperations } from '@/hooks/useProductOperations';
 import { useFilters } from '@/hooks/useFilters';
 import { getRussianFields } from '@/utils/productHelpers';
+import { hasPermission } from '@/types/user';
+import { useUserManagement } from '@/hooks/useUserManagement';
 import MainHeader from '@/components/MainHeader';
 import MainContent from '@/components/MainContent';
+import AuthModal from '@/components/AuthModal';
 
-const Index = () => {
-  const [language, setLanguage] = useState<Language>('ru');
+interface IndexProps {
+  forceLanguage?: Language;
+}
+
+const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
+  const [language, setLanguage] = useState<Language>(forceLanguage || 'ru');
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { authState, logout } = useUserManagement();
+  
   const t = translations[language];
+
+  // Принудительный язык для китайской версии
+  useEffect(() => {
+    if (forceLanguage) {
+      setLanguage(forceLanguage);
+    }
+  }, [forceLanguage]);
+
+  // Показываем модальное окно авторизации при первом запуске (если не гость)
+  useEffect(() => {
+    if (!authState.isAuthenticated && !authState.isGuest && !forceLanguage) {
+      setShowAuthModal(true);
+    }
+  }, [authState, forceLanguage]);
   
   // Get data and operations from custom hooks
   const { products, setProducts, categories, setCategories } = useProductsData();
@@ -70,6 +94,12 @@ const Index = () => {
   });
 
   const handleAddProduct = () => {
+    // Проверяем права на создание продуктов
+    if (!hasPermission(authState.currentUser, 'write', 'products', language)) {
+      alert(t.noPermission || 'У вас нет прав для выполнения этого действия');
+      return;
+    }
+    
     if (newProduct.nameEn && newProduct.sku) {
       const autoRussianFields = getRussianFields(newProduct.category || '', newProduct.nameEn || '');
       
@@ -120,6 +150,12 @@ const Index = () => {
   };
 
   const handleUpdateCategories = (newCategories: Category[]) => {
+    // Проверяем права на изменение категорий
+    if (!hasPermission(authState.currentUser, 'write', 'categories', language)) {
+      alert(t.noPermission || 'У вас нет прав для выполнения этого действия');
+      return;
+    }
+    
     setCategories(newCategories);
     
     // Check if any products have categories that no longer exist
@@ -161,6 +197,10 @@ const Index = () => {
         onAddProduct={handleAddProduct}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        currentUser={authState.currentUser}
+        isGuest={authState.isGuest}
+        onShowAuth={() => setShowAuthModal(true)}
+        onLogout={logout}
       />
 
       <MainContent
@@ -192,6 +232,13 @@ const Index = () => {
         onRemoveImage={removeImageFromProduct}
         onSetCurrentImage={setCurrentImage}
         onUpdateCategories={handleUpdateCategories}
+      />
+
+      {/* Модальное окно авторизации */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        language={language}
       />
     </div>
   );
