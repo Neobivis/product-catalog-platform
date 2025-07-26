@@ -34,9 +34,9 @@ const PriceRequestsPage: React.FC<PriceRequestsPageProps> = ({ forceLanguage }) 
     }
   }, [forceLanguage]);
 
-  // Автоматическое переключение на китайский для пользователей chinese_only
+  // Автоматическое переключение на китайский для пользователей chinese_only и victor
   useEffect(() => {
-    if (authState.currentUser?.role === 'chinese_only' && !forceLanguage) {
+    if ((authState.currentUser?.role === 'chinese_only' || authState.currentUser?.role === 'victor') && !forceLanguage) {
       setLanguage('cn');
     }
   }, [authState.currentUser, forceLanguage]);

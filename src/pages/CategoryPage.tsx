@@ -9,6 +9,7 @@ import ImageModal from '@/components/ImageModal';
 import MainHeader from '@/components/MainHeader';
 import { useProductsData } from '@/hooks/useProductsData';
 import { useProductOperations } from '@/hooks/useProductOperations';
+import { useUserManagement } from '@/hooks/useUserManagement';
 import { Product, Category, Language } from '@/types/product';
 import { getRussianFields } from '@/utils/productHelpers';
 import { translations } from '@/utils/translations';
@@ -39,6 +40,7 @@ const CategoryPage: React.FC = () => {
   
   // Get data from hook
   const { products, setProducts, categories } = useProductsData();
+  const { authState } = useUserManagement();
   
   // Get product operations for editing
   const {
@@ -57,6 +59,13 @@ const CategoryPage: React.FC = () => {
   } = useProductOperations(products, setProducts);
   
   const t = translations[language];
+
+  // Автоматическое переключение на китайский для пользователей chinese_only и victor
+  useEffect(() => {
+    if (authState.currentUser?.role === 'chinese_only' || authState.currentUser?.role === 'victor') {
+      setLanguage('cn');
+    }
+  }, [authState.currentUser]);
 
   // Find category by path
   const findCategoryByPath = (cats: Category[], path: string): Category | null => {

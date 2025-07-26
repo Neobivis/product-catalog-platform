@@ -51,7 +51,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
 
   // Проверяем права на добавление продуктов
   const canAddProducts = currentUser 
-    ? hasPermission(currentUser, 'write', 'products', language) && currentUser.role !== 'chinese_only'
+    ? hasPermission(currentUser, 'write', 'products', language) && currentUser.role !== 'chinese_only' && currentUser.role !== 'victor'
     : false;
 
   // Проверяем права на админку

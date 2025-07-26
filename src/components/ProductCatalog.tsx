@@ -342,7 +342,7 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
                 </div>
 
                 {/* Russian-specific fields */}
-                {language === 'ru' && (
+                {language === 'ru' && authState.currentUser?.role !== 'victor' && (
                   <div className="border-t pt-4 mt-4">
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
