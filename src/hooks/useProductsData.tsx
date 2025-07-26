@@ -72,24 +72,50 @@ export const useProductsData = () => {
   const [categories] = useState<Category[]>([
     {
       id: 'electronics',
-      name: 'Electronics',
+      name: 'Электроника',
+      icon: 'Smartphone',
       children: [
-        { id: 'audio', name: 'Audio' },
-        { id: 'wearables', name: 'Wearables' },
-        { id: 'computers', name: 'Computers' }
+        { id: 'audio', name: 'Аудио', icon: 'Headphones' },
+        { id: 'wearables', name: 'Носимые устройства', icon: 'Watch' },
+        { id: 'computers', name: 'Компьютеры', icon: 'Laptop' }
       ]
     },
     {
       id: 'clothing',
-      name: 'Clothing',
+      name: 'Одежда',
+      icon: 'Shirt',
       children: [
-        { id: 'shirts', name: 'Shirts' },
-        { id: 'pants', name: 'Pants' }
+        { id: 'shirts', name: 'Рубашки', icon: 'Shirt' },
+        { id: 'pants', name: 'Брюки', icon: 'Crown' }
       ]
     },
     {
       id: 'home',
-      name: 'Home & Garden'
+      name: 'Дом и сад',
+      icon: 'Home'
+    },
+    {
+      id: 'sports',
+      name: 'Спорт и отдых',
+      icon: 'Dumbbell',
+      children: [
+        { id: 'fitness', name: 'Фитнес', icon: 'Activity' },
+        { id: 'outdoor', name: 'Активный отдых', icon: 'Mountain' }
+      ]
+    },
+    {
+      id: 'beauty',
+      name: 'Красота и здоровье',
+      icon: 'Heart',
+      children: [
+        { id: 'skincare', name: 'Уход за кожей', icon: 'Sparkles' },
+        { id: 'makeup', name: 'Макияж', icon: 'Palette' }
+      ]
+    },
+    {
+      id: 'auto',
+      name: 'Автотовары',
+      icon: 'Car'
     }
   ]);
 

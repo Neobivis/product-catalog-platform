@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
-import { Language } from '@/types/product';
+import { Language, Category } from '@/types/product';
 import LanguageToggle from '@/components/LanguageToggle';
 import AddProductForm from '@/components/AddProductForm';
+import CatalogMenu from '@/components/CatalogMenu';
 
 interface MainHeaderProps {
   language: Language;
@@ -13,6 +14,7 @@ interface MainHeaderProps {
   newProduct: any;
   setNewProduct: (product: any) => void;
   allCategories: string[];
+  categories: Category[];
   translations: any;
   onAddProduct: () => void;
   activeTab: string;
@@ -27,6 +29,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
   newProduct,
   setNewProduct,
   allCategories,
+  categories,
   translations: t,
   onAddProduct,
   activeTab,
@@ -36,18 +39,23 @@ const MainHeader: React.FC<MainHeaderProps> = ({
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 lg:px-6 py-4 shadow-sm backdrop-blur-sm bg-white/95">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-4">
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-900">{t.title}</h1>
-          <LanguageToggle language={language} onLanguageChange={onLanguageChange} />
+          <div className="flex items-center gap-4">
+            <CatalogMenu categories={categories} translations={t} />
+            <h1 className="text-xl lg:text-2xl font-bold text-gray-900">{t.title}</h1>
+          </div>
           
-          <AddProductForm
-            showAddForm={showAddForm}
-            setShowAddForm={setShowAddForm}
-            newProduct={newProduct}
-            setNewProduct={setNewProduct}
-            allCategories={allCategories}
-            translations={t}
-            onAddProduct={onAddProduct}
-          />
+          <div className="flex items-center gap-4">
+            <LanguageToggle language={language} onLanguageChange={onLanguageChange} />
+            <AddProductForm
+              showAddForm={showAddForm}
+              setShowAddForm={setShowAddForm}
+              newProduct={newProduct}
+              setNewProduct={setNewProduct}
+              allCategories={allCategories}
+              translations={t}
+              onAddProduct={onAddProduct}
+            />
+          </div>
         </div>
         
         {/* Navigation */}

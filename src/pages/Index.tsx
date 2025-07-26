@@ -129,6 +129,7 @@ const Index = () => {
         newProduct={newProduct}
         setNewProduct={setNewProduct}
         allCategories={allCategories}
+        categories={categories}
         translations={t}
         onAddProduct={handleAddProduct}
         activeTab={activeTab}
