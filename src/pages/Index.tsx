@@ -33,14 +33,25 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const autoLoginUserId = urlParams.get('auto-login');
+    const expectedRole = urlParams.get('role');
     
-    if (autoLoginUserId && !authState.isAuthenticated && loginUserById) {
-      loginUserById(autoLoginUserId);
-      // Очищаем URL от параметра
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, '', newUrl);
+    // Проверяем, что никто не авторизован или авторизован другой пользователь
+    if (autoLoginUserId && loginUserById) {
+      const isCurrentUserDifferent = authState.currentUser?.id !== autoLoginUserId;
+      const isNotAuthenticated = !authState.isAuthenticated;
+      const isRoleMatching = !expectedRole || authState.currentUser?.role === expectedRole;
+      
+      // Входим только если пользователь не авторизован, авторизован другой пользователь, или роли не совпадают
+      if (isNotAuthenticated || isCurrentUserDifferent || !isRoleMatching) {
+        const success = loginUserById(autoLoginUserId);
+        if (success) {
+          // Очищаем URL от параметров только при успешном входе
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, '', newUrl);
+        }
+      }
     }
-  }, [authState.isAuthenticated, loginUserById]);
+  }, [authState.isAuthenticated, authState.currentUser?.id, authState.currentUser?.role, loginUserById]);
 
   // Принудительный язык для китайской версии
   useEffect(() => {

@@ -41,9 +41,10 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
   };
 
   // Генерация специальной ссылки для пользователя
-  const generateSpecialLink = (userId: string) => {
+  const generateSpecialLink = (userId: string, userRole: string) => {
     const baseUrl = window.location.origin;
-    return `${baseUrl}/?auto-login=${userId}`;
+    // Добавляем роль в ссылку для уникальности
+    return `${baseUrl}/?auto-login=${userId}&role=${userRole}`;
   };
 
   const t = {
@@ -243,11 +244,11 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    {user.role === 'victor' && (
+                    {(user.role === 'victor' || user.role === 'admin') && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => copyToClipboard(generateSpecialLink(user.id))}
+                        onClick={() => copyToClipboard(generateSpecialLink(user.id, user.role))}
                         title="Скопировать ссылку для входа"
                       >
                         <Icon name="Link" size={14} />

@@ -201,6 +201,11 @@ export const useUserManagement = () => {
     const user = users.find(u => u.id === userId && u.isActive);
     
     if (user) {
+      // Если авторизован другой пользователь - сначала выходим
+      if (authState.currentUser && authState.currentUser.id !== userId) {
+        logout();
+      }
+      
       const newAuthState: AuthState = {
         currentUser: { ...user, lastLogin: new Date().toISOString() },
         isAuthenticated: true,
