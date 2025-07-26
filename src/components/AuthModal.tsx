@@ -13,37 +13,41 @@ interface AuthModalProps {
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, language }) => {
   const { login, loginAsAdmin, continueAsGuest, users } = useUserManagement();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const t = {
     ru: {
       title: 'Вход в систему',
-      username: 'Имя пользователя',
+      email: 'Email',
+      password: 'Пароль',
       login: 'Войти',
       continueAsGuest: 'Продолжить как гость',
       quickLogin: 'Быстрый вход',
-      error: 'Пользователь не найден или неактивен',
+      error: 'Неверные данные для входа',
       adminAccess: 'Администратор',
       userNotFound: 'Пользователь не найден'
     },
     en: {
       title: 'Login',
-      username: 'Username',
+      email: 'Email',
+      password: 'Password',
       login: 'Login',
       continueAsGuest: 'Continue as Guest',
       quickLogin: 'Quick Login',
-      error: 'User not found or inactive',
+      error: 'Invalid login credentials',
       adminAccess: 'Administrator',
       userNotFound: 'User not found'
     },
     cn: {
       title: '登录',
-      username: '用户名',
+      email: '邮箱',
+      password: '密码',
       login: '登录',
       continueAsGuest: '以访客身份继续',
       quickLogin: '快速登录',
-      error: '用户未找到或已禁用',
+      error: '登录凭据无效',
       adminAccess: '管理员',
       userNotFound: '用户未找到'
     }
@@ -52,8 +56,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, language }) => {
   const currentT = t[language];
 
   const handleLogin = () => {
-    if (username.trim()) {
-      const success = login(username.trim());
+    if (email.trim() && password.trim()) {
+      const success = login(email.trim(), password.trim());
       if (success) {
         setError('');
         onClose();
@@ -93,11 +97,23 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, language }) => {
           {/* Основная форма входа */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">{currentT.username}</label>
+              <label className="block text-sm font-medium mb-1">{currentT.email}</label>
               <Input
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder={currentT.username}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={currentT.email}
+                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-1">{currentT.password}</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={currentT.password}
                 onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
               />
             </div>
@@ -111,11 +127,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, language }) => {
             </Button>
           </div>
 
-          {/* Быстрый вход */}
+          {/* Быстрый вход (только для не-админов) */}
           <div>
             <div className="text-sm font-medium mb-2">{currentT.quickLogin}:</div>
             <div className="space-y-2">
-              {users.filter(u => u.isActive).map(user => (
+              {users.filter(u => u.isActive && u.role !== 'admin').map(user => (
                 <Button
                   key={user.id}
                   variant="outline"
@@ -124,12 +140,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, language }) => {
                   className="w-full justify-start"
                 >
                   <Icon 
-                    name={user.role === 'admin' ? 'Crown' : user.role === 'chinese_only' ? 'Globe' : 'User'} 
+                    name={user.role === 'chinese_only' ? 'Globe' : 'User'} 
                     size={14} 
                     className="mr-2" 
                   />
                   {user.username}
-                  {user.role === 'admin' && ` (${currentT.adminAccess})`}
                 </Button>
               ))}
             </div>

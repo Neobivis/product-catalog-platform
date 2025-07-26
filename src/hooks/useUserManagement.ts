@@ -12,7 +12,8 @@ const createDefaultUsers = (): User[] => {
     {
       id: '1',
       username: 'Администратор',
-      email: 'admin@poehali.dev',
+      email: 'neobivis@gmail.com',
+      password: 'Neo321678',
       role: 'admin',
       createdAt: now,
       isActive: true,
@@ -139,9 +140,18 @@ export const useUserManagement = () => {
     }
   };
 
-  // Авторизация пользователя
-  const login = (username: string): boolean => {
-    const user = users.find(u => u.username === username && u.isActive);
+  // Авторизация пользователя по логину и паролю
+  const login = (email: string, password?: string): boolean => {
+    const user = users.find(u => {
+      if (password) {
+        // Вход по email и паролю
+        return u.email === email && u.password === password && u.isActive;
+      } else {
+        // Вход по username (для старого API)
+        return u.username === email && u.isActive;
+      }
+    });
+    
     if (user) {
       const newAuthState: AuthState = {
         currentUser: { ...user, lastLogin: new Date().toISOString() },
@@ -152,6 +162,12 @@ export const useUserManagement = () => {
       
       // Обновляем время последнего входа
       updateUser(user.id, { lastLogin: new Date().toISOString() });
+      
+      // Перезагружаем страницу после входа
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+      
       return true;
     }
     return false;
