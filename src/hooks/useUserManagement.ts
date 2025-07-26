@@ -23,11 +23,10 @@ const createDefaultUsers = (): User[] => {
       id: '2', 
       username: 'Victor',
       email: 'victor@company.com',
-      role: 'chinese_only',
+      role: 'victor',
       createdAt: now,
       isActive: true,
-      permissions: rolePermissions.chinese_only,
-      specialLink: `/cn/${Math.random().toString(36).substring(2, 15)}`
+      permissions: rolePermissions.victor
     }
   ];
 };
