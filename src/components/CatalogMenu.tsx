@@ -51,8 +51,9 @@ const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }
 
   const navigateToCategory = (category: Category) => {
     if (!category.children || category.children.length === 0) {
-      // Leaf category - handle selection
-      console.log('Selected category:', [...breadcrumb, category].map(c => c.name).join('/'));
+      // Leaf category - navigate to category page
+      const categoryPath = [...breadcrumb, category].map(c => encodeURIComponent(c.name)).join('/');
+      window.location.href = `/category/${categoryPath}`;
       setIsOpen(false);
       // Reset to root
       setCurrentCategories(categories);
