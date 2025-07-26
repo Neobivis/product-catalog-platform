@@ -61,7 +61,8 @@ const ProductCatalog: React.FC<ProductCatalogProps> = ({
   onFieldEdit,
   onImageNavigation,
   onShowImageManager,
-  onImageClick
+  onImageClick,
+  onAdditionalCategoriesChange
 }) => {
   return (
     <div className="space-y-6">
