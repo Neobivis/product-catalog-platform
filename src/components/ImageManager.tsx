@@ -62,7 +62,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/*,.svg"
                     onChange={(e) => onFileUpload(productId, e)}
                     className="hidden"
                   />
@@ -80,7 +80,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({
               <TabsContent value="url" className="space-y-4">
                 <div className="flex gap-2">
                   <Input
-                    placeholder="https://example.com/image.jpg"
+                    placeholder="https://example.com/image.jpg или .svg"
                     value={newImageUrl}
                     onChange={(e) => setNewImageUrl(e.target.value)}
                     className="flex-1"

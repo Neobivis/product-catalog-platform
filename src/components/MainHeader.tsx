@@ -42,10 +42,21 @@ const MainHeader: React.FC<MainHeaderProps> = ({
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-4">
           <div className="flex items-center gap-4">
             {/* Logo */}
-            <Link to="/" className="flex-shrink-0">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg hover:bg-blue-700 transition-colors">
-                П
-              </div>
+            <Link to="/" className="flex-shrink-0 hover:opacity-80 transition-opacity">
+              <img 
+                src="/img/logo.svg" 
+                alt="Логотип" 
+                className="w-10 h-10"
+                onError={(e) => {
+                  // Fallback to text logo if SVG fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallback = document.createElement('div');
+                  fallback.className = 'w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg';
+                  fallback.textContent = 'П';
+                  target.parentNode?.appendChild(fallback);
+                }}
+              />
             </Link>
             
             <CatalogMenu categories={categories} translations={t} />
