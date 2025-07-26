@@ -13,12 +13,20 @@ export const useProductsData = () => {
   // Initialize state with data from localStorage or defaults
   const [products, setProducts] = useState<Product[]>(() => {
     const savedProducts = loadProductsFromStorage();
-    return savedProducts || defaultProducts;
+    // Если в localStorage нет данных, всегда возвращаем defaultProducts
+    if (!savedProducts || savedProducts.length === 0) {
+      return defaultProducts;
+    }
+    return savedProducts;
   });
 
   const [categories, setCategories] = useState<Category[]>(() => {
     const savedCategories = loadCategoriesFromStorage();
-    return savedCategories || defaultCategories;
+    // Если в localStorage нет данных, всегда возвращаем defaultCategories
+    if (!savedCategories || savedCategories.length === 0) {
+      return defaultCategories;
+    }
+    return savedCategories;
   });
 
   // Save to localStorage when data changes
@@ -29,6 +37,21 @@ export const useProductsData = () => {
   useEffect(() => {
     saveCategoriesToStorage(categories);
   }, [categories]);
+
+  // Инициализация данными по умолчанию если localStorage пуст
+  useEffect(() => {
+    const savedProducts = loadProductsFromStorage();
+    if (!savedProducts || savedProducts.length === 0) {
+      setProducts(defaultProducts);
+      saveProductsToStorage(defaultProducts);
+    }
+    
+    const savedCategories = loadCategoriesFromStorage();
+    if (!savedCategories || savedCategories.length === 0) {
+      setCategories(defaultCategories);
+      saveCategoriesToStorage(defaultCategories);
+    }
+  }, []);
 
   return {
     products,

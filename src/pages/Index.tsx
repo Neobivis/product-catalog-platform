@@ -8,6 +8,7 @@ import { useFilters } from '@/hooks/useFilters';
 import { getRussianFields } from '@/utils/productHelpers';
 import { hasPermission } from '@/types/user';
 import { useUserManagement } from '@/hooks/useUserManagement';
+import { ensureDataForVictor } from '@/utils/victorDataSync';
 import MainHeader from '@/components/MainHeader';
 import MainContent from '@/components/MainContent';
 import AuthModal from '@/components/AuthModal';
@@ -91,6 +92,21 @@ const Index: React.FC<IndexProps> = ({ forceLanguage }) => {
   
   // Get data and operations from custom hooks
   const { products, setProducts, categories, setCategories } = useProductsData();
+  
+  // Обеспечиваем наличие данных для Victor в любом браузере
+  useEffect(() => {
+    if (authState.currentUser?.role === 'victor') {
+      const { products: defaultProducts, categories: defaultCategories } = ensureDataForVictor();
+      
+      // Проверяем нет ли уже товаров в текущем состоянии
+      if (products.length === 0) {
+        setProducts(defaultProducts);
+      }
+      if (categories.length === 0) {
+        setCategories(defaultCategories);
+      }
+    }
+  }, [authState.currentUser, products.length, categories.length, setProducts, setCategories]);
   
   const {
     editingField,
