@@ -91,17 +91,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   };
 
   const handleCategorySelect = (category: Category) => {
-    let fullPath: string;
-    
-    if (searchQuery) {
-      // При поиске используем полный путь от корня
-      const categoryPath = getCategoryPath(category, categories);
-      fullPath = categoryPath ? categoryPath.join('/') : category.name;
-    } else {
-      // В обычном режиме используем путь через breadcrumb
-      fullPath = [...breadcrumb, category].map(cat => cat.name).join('/');
-    }
-    
+    const fullPath = [...breadcrumb, category].map(cat => cat.name).join('/');
     onSelect(fullPath);
     onClose();
   };
@@ -125,73 +115,13 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
     }));
   };
 
-  // Автоматически разворачиваем категории при поиске
-  const autoExpandForSearch = (cats: Category[], query: string, expandedSet: Set<string>) => {
-    if (!query) return;
-    
-    cats.forEach(cat => {
-      const matchesName = cat.name.toLowerCase().includes(query.toLowerCase());
-      const hasMatchingChildren = cat.children && 
-        filterCategories(cat.children, query).length > 0;
-      
-      if (matchesName || hasMatchingChildren) {
-        expandedSet.add(cat.id);
-        if (cat.children) {
-          autoExpandForSearch(cat.children, query, expandedSet);
-        }
-      }
-    });
-  };
-
-  // Обновляем развернутые категории при изменении поискового запроса
-  useEffect(() => {
-    if (searchQuery) {
-      const newExpanded = new Set<string>();
-      autoExpandForSearch(categories, searchQuery, newExpanded);
-      setExpandedCategories(newExpanded);
-    } else {
-      // При очистке поиска возвращаем к изначальному состоянию
-      const expanded = new Set<string>();
-      if (selectedValue) {
-        const pathParts = selectedValue.split('/');
-        let currentCats = categories;
-        for (let i = 0; i < pathParts.length - 1; i++) {
-          const cat = currentCats.find(c => c.name === pathParts[i]);
-          if (cat) {
-            expanded.add(cat.id);
-            currentCats = cat.children || [];
-          }
-        }
-      }
-      setExpandedCategories(expanded);
-    }
-  }, [searchQuery, categories, selectedValue]);
-
-  // Получаем полный путь к категории для отображения при поиске
-  const getCategoryPath = (targetCategory: Category, cats: Category[], path: string[] = []): string[] | null => {
-    for (const cat of cats) {
-      const currentPath = [...path, cat.name];
-      if (cat.id === targetCategory.id) {
-        return currentPath;
-      }
-      if (cat.children) {
-        const found = getCategoryPath(targetCategory, cat.children, currentPath);
-        if (found) return found;
-      }
-    }
-    return null;
-  };
-
   const renderCategoryTree = (cats: Category[], level = 0) => {
     const filteredCats = searchQuery ? filterCategories(cats, searchQuery) : cats;
     
     return filteredCats.map(category => {
-      const isExpanded = expandedCategories.has(category.id) || !!searchQuery;
+      const isExpanded = expandedCategories.has(category.id);
       const hasChildren = category.children && category.children.length > 0;
       const isSelected = selectedValue === [...breadcrumb, category].map(c => c.name).join('/');
-      
-      // Получаем полный путь для отображения при поиске
-      const fullPath = searchQuery ? getCategoryPath(category, categories) : null;
 
       return (
         <div key={category.id} className="mb-2">
@@ -246,11 +176,6 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                   <h3 className={`font-semibold text-lg ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
                     {category.name}
                   </h3>
-                  {fullPath && fullPath.length > 1 && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      {fullPath.slice(0, -1).join(' → ')}
-                    </p>
-                  )}
                   {breadcrumb.length > 0 && (
                     <p className="text-sm text-gray-500 truncate">
                       {[...breadcrumb, category].map(c => c.name).join(' → ')}

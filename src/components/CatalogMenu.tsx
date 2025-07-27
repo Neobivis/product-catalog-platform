@@ -7,10 +7,9 @@ import { useNavigate } from 'react-router-dom';
 interface CatalogMenuProps {
   categories: Category[];
   translations: any;
-  onPriceRequestFilter?: () => void;
 }
 
-const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t, onPriceRequestFilter }) => {
+const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [currentCategories, setCurrentCategories] = useState<Category[]>(categories);
@@ -250,34 +249,7 @@ const CatalogMenu: React.FC<CatalogMenuProps> = ({ categories, translations: t, 
                 )}
                 
                 {currentCategories.length > 0 ? (
-                  <>
-                    {renderCategories()}
-                    
-                    {/* Special "Price Request" category - Show only at root level */}
-                    {breadcrumb.length === 0 && (
-                      <div
-                        className="flex items-center justify-between px-4 py-3 cursor-pointer transition-colors hover:bg-green-50 border-b border-green-100 bg-green-25 mt-2 border-t-2 border-t-green-200"
-                        onClick={() => {
-                          if (onPriceRequestFilter) {
-                            onPriceRequestFilter();
-                          }
-                          setIsOpen(false);
-                          setCurrentCategories(categories);
-                          setBreadcrumb([]);
-                        }}
-                      >
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <Icon 
-                            name="MessageSquare" 
-                            size={18} 
-                            className="text-green-600 flex-shrink-0" 
-                          />
-                          <span className="text-sm font-medium text-green-700">{t.priceRequestCategory || 'Запрос цены'}</span>
-                        </div>
-                        <Icon name="ExternalLink" size={16} className="text-green-400" />
-                      </div>
-                    )}
-                  </>
+                  renderCategories()
                 ) : (
                   <div className="px-4 py-8 text-center text-gray-500">
                     <Icon name="Package" size={32} className="mx-auto mb-2 text-gray-400" />

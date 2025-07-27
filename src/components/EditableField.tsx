@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -11,7 +11,6 @@ interface EditableFieldProps {
   editingField: {productId: string, field: string} | null;
   setEditingField: (field: {productId: string, field: string} | null) => void;
   onFieldEdit: (productId: string, field: string, value: string | number) => void;
-  disabled?: boolean;
 }
 
 const EditableField: React.FC<EditableFieldProps> = ({ 
@@ -21,8 +20,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
   type = 'text',
   editingField,
   setEditingField,
-  onFieldEdit,
-  disabled = false
+  onFieldEdit
 }) => {
   const isEditing = editingField?.productId === productId && editingField?.field === field;
 
@@ -75,90 +73,22 @@ const EditableField: React.FC<EditableFieldProps> = ({
   };
 
   if (isEditing) {
-    const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
-
-    const handleSave = () => {
-      if (inputRef.current) {
-        onFieldEdit(productId, field, inputRef.current.value);
-        setEditingField(null);
-      }
-    };
-
-    const handleCancel = () => {
-      setEditingField(null);
-    };
-
     return (
-      <div className="space-y-2">
-        {type === 'number' ? (
-          <Input
-            ref={inputRef as React.RefObject<HTMLInputElement>}
-            type="number"
-            defaultValue={value}
-            className="w-full text-sm"
-            autoFocus
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSave();
-              }
-              if (e.key === 'Escape') {
-                handleCancel();
-              }
-            }}
-          />
-        ) : field === 'webLink' || field === 'description' ? (
-          <textarea
-            ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-            defaultValue={value}
-            className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md resize-vertical focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            autoFocus
-            placeholder="Введите ссылки, каждую с новой строки..."
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.ctrlKey) {
-                handleSave();
-              }
-              if (e.key === 'Escape') {
-                handleCancel();
-              }
-            }}
-          />
-        ) : (
-          <Input
-            ref={inputRef as React.RefObject<HTMLInputElement>}
-            type="text"
-            defaultValue={value}
-            className="w-full text-sm"
-            autoFocus
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSave();
-              }
-              if (e.key === 'Escape') {
-                handleCancel();
-              }
-            }}
-          />
-        )}
-        
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 w-8 p-0 bg-green-50 border-green-200 hover:bg-green-100"
-            onClick={handleSave}
-          >
-            <Icon name="Check" size={14} className="text-green-600" />
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 w-8 p-0 bg-red-50 border-red-200 hover:bg-red-100"
-            onClick={handleCancel}
-          >
-            <Icon name="X" size={14} className="text-red-600" />
-          </Button>
-        </div>
-      </div>
+      <textarea
+        defaultValue={value}
+        className="w-full min-h-[80px] p-2 text-sm border border-gray-300 rounded-md resize-vertical focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        autoFocus
+        placeholder="Введите ссылки, каждую с новой строки..."
+        onBlur={(e) => onFieldEdit(productId, field, e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && e.ctrlKey) {
+            onFieldEdit(productId, field, e.currentTarget.value);
+          }
+          if (e.key === 'Escape') {
+            setEditingField(null);
+          }
+        }}
+      />
     );
   }
 
@@ -167,16 +97,14 @@ const EditableField: React.FC<EditableFieldProps> = ({
       <div className="flex-1 min-w-0">
         {renderValue(value)}
       </div>
-      {!disabled && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 flex-shrink-0"
-          onClick={() => setEditingField({ productId, field })}
-        >
-          <Icon name="Edit2" size={12} />
-        </Button>
-      )}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 flex-shrink-0"
+        onClick={() => setEditingField({ productId, field })}
+      >
+        <Icon name="Edit2" size={12} />
+      </Button>
     </div>
   );
 };

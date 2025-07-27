@@ -14,33 +14,18 @@ export const useFilters = (products: Product[], categories: Category[]) => {
 
   const allCategories = useMemo(() => {
     const flatCategories: string[] = [];
-    const categorySet = new Set<string>();
-    
-    // Добавляем категории из структуры категорий
     const traverse = (cats: Category[], prefix = '') => {
       cats.forEach(cat => {
         const fullPath = prefix ? `${prefix}/${cat.name}` : cat.name;
-        categorySet.add(fullPath);
+        flatCategories.push(fullPath);
         if (cat.children) {
           traverse(cat.children, fullPath);
         }
       });
     };
     traverse(categories);
-    
-    // Добавляем основные категории товаров
-    products.forEach(product => {
-      if (product.category) {
-        categorySet.add(product.category);
-      }
-      // Добавляем дополнительные категории товаров
-      if (product.additionalCategories) {
-        product.additionalCategories.forEach(cat => categorySet.add(cat));
-      }
-    });
-    
-    return Array.from(categorySet);
-  }, [categories, products]);
+    return flatCategories;
+  }, [categories]);
 
   // Filter products
   const filteredProducts = useMemo(() => {
@@ -53,25 +38,14 @@ export const useFilters = (products: Product[], categories: Category[]) => {
         product.nameRu.toLowerCase().includes(searchLower) ||
         product.sku.toLowerCase().includes(searchLower) ||
         product.brand.toLowerCase().includes(searchLower) ||
-        product.category.toLowerCase().includes(searchLower) ||
-        (product.additionalCategories && 
-         product.additionalCategories.some(cat => cat.toLowerCase().includes(searchLower)));
+        product.category.toLowerCase().includes(searchLower);
 
       // Brand filter
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
 
-      // Category filter - проверяем как основную, так и дополнительные категории
+      // Category filter
       const matchesCategory = selectedCategories.length === 0 || 
-        selectedCategories.some(cat => {
-          // Проверяем основную категорию
-          const matchesPrimary = product.category.includes(cat) || product.category === cat;
-          
-          // Проверяем дополнительные категории
-          const matchesAdditional = product.additionalCategories && 
-            product.additionalCategories.some(addCat => addCat.includes(cat) || addCat === cat);
-          
-          return matchesPrimary || matchesAdditional;
-        });
+        selectedCategories.some(cat => product.category.includes(cat));
 
       // Price filter
       const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
