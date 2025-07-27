@@ -27,6 +27,16 @@ const createDefaultUsers = (): User[] => {
       createdAt: now,
       isActive: true,
       permissions: rolePermissions.victor
+    },
+    {
+      id: '3',
+      username: 'Домакс',
+      email: 'DOMAKS',
+      password: 'DOMAKS',
+      role: 'broker',
+      createdAt: now,
+      isActive: true,
+      permissions: rolePermissions.broker
     }
   ];
 };
@@ -147,14 +157,14 @@ export const useUserManagement = () => {
   };
 
   // Авторизация пользователя по логину и паролю
-  const login = (email: string, password?: string): boolean => {
+  const login = (loginField: string, password?: string): boolean => {
     const user = users.find(u => {
       if (password) {
-        // Вход по email и паролю
-        return u.email === email && u.password === password && u.isActive;
+        // Вход по email/логину и паролю
+        return (u.email === loginField || u.username === loginField) && u.password === password && u.isActive;
       } else {
         // Вход по username (для старого API)
-        return u.username === email && u.isActive;
+        return u.username === loginField && u.isActive;
       }
     });
     

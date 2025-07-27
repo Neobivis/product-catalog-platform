@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'editor' | 'viewer' | 'chinese_only' | 'victor';
+export type UserRole = 'admin' | 'editor' | 'viewer' | 'chinese_only' | 'victor' | 'broker';
 
 export interface User {
   id: string;
@@ -18,6 +18,8 @@ export interface Permission {
   action: 'read' | 'write' | 'delete' | 'admin';
   resource: 'products' | 'categories' | 'users' | 'all';
   language?: 'ru' | 'en' | 'cn'; // Ограничение по языку
+  fields?: string[]; // Ограничение по полям (для брокеров)
+  sections?: string[]; // Ограничение по разделам сайта (для брокеров)
 }
 
 export interface AuthState {
@@ -47,6 +49,10 @@ export const rolePermissions: Record<UserRole, Permission[]> = {
   victor: [
     { action: 'read', resource: 'all' },
     { action: 'write', resource: 'products' } // Ограниченное редактирование только определенных полей
+  ],
+  broker: [
+    { action: 'read', resource: 'all' },
+    { action: 'write', resource: 'products' } // Настраиваемые права через админку
   ]
 };
 
@@ -98,6 +104,76 @@ export const canEditField = (user: User | null, fieldName: string): boolean => {
     return canVictorEditField(fieldName);
   }
   
+  // Пользователь Broker может редактировать только разрешенные поля
+  if (user.role === 'broker') {
+    const productPermission = user.permissions.find(p => p.resource === 'products' && p.action === 'write');
+    if (productPermission && productPermission.fields) {
+      return productPermission.fields.includes(fieldName);
+    }
+    return false;
+  }
+  
   // Остальные пользователи с правами на запись могут редактировать все поля
   return hasPermission(user, 'write', 'products');
 };
+
+// Проверка может ли пользователь видеть определенный раздел сайта
+export const canViewSection = (user: User | null, sectionName: string): boolean => {
+  if (!user || !user.isActive) return true; // Гости видят все разделы
+  
+  // Администратор видит все разделы
+  if (user.permissions.some(p => p.action === 'admin' && p.resource === 'all')) {
+    return true;
+  }
+  
+  // Пользователь Broker может видеть только разрешенные разделы
+  if (user.role === 'broker') {
+    const permission = user.permissions.find(p => p.sections);
+    if (permission && permission.sections) {
+      return permission.sections.includes(sectionName);
+    }
+    return false;
+  }
+  
+  // Остальные пользователи видят все разделы
+  return true;
+};
+
+// Типы для настройки прав брокеров
+export interface BrokerRightsConfig {
+  userId: string;
+  allowedSections: string[];
+  allowedFields: string[];
+}
+
+// Доступные разделы сайта для настройки прав
+export const availableSections = [
+  'catalog',
+  'categories',
+  'price-requests',
+  'reports',
+  'statistics',
+  'user-management'
+];
+
+// Доступные поля товара для настройки прав
+export const availableProductFields = [
+  'name',
+  'nameEn', 
+  'nameCn',
+  'description',
+  'descriptionEn',
+  'descriptionCn',
+  'price',
+  'currency',
+  'category',
+  'additionalCategories',
+  'brand',
+  'model',
+  'availability',
+  'inStock',
+  'images',
+  'specifications',
+  'weight',
+  'dimensions'
+];

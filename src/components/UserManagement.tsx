@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { User, UserRole } from '@/types/user';
 import { useUserManagement } from '@/hooks/useUserManagement';
+import BrokerPermissions from '@/components/BrokerPermissions';
 
 interface UserManagementProps {
   language: 'ru' | 'en' | 'cn';
@@ -16,6 +17,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
   const { users, createUser, updateUser, deleteUser } = useUserManagement();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [showBrokerPermissions, setShowBrokerPermissions] = useState(false);
   const [newUser, setNewUser] = useState({
     username: '',
     email: '',
@@ -70,7 +72,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
         admin: 'Администратор',
         editor: 'Редактор',
         viewer: 'Наблюдатель',
-        chinese_only: 'Только китайская версия'
+        chinese_only: 'Только китайская версия',
+        broker: 'Брокер'
       }
     },
     en: {
@@ -95,7 +98,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
         admin: 'Administrator',
         editor: 'Editor',
         viewer: 'Viewer',
-        chinese_only: 'Chinese Only'
+        chinese_only: 'Chinese Only',
+        broker: 'Broker'
       }
     },
     cn: {
@@ -120,7 +124,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
         admin: '管理员',
         editor: '编辑者',
         viewer: '查看者',
-        chinese_only: '仅中文版本'
+        chinese_only: '仅中文版本',
+        broker: '经纪人'
       }
     }
   };
@@ -159,10 +164,16 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{currentT.title}</h2>
-        <Button onClick={() => setShowAddForm(true)}>
-          <Icon name="Plus" size={16} className="mr-2" />
-          {currentT.addUser}
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowBrokerPermissions(true)} variant="outline">
+            <Icon name="Settings" size={16} className="mr-2" />
+            Настройка прав брокеров
+          </Button>
+          <Button onClick={() => setShowAddForm(true)}>
+            <Icon name="Plus" size={16} className="mr-2" />
+            {currentT.addUser}
+          </Button>
+        </div>
       </div>
 
       {/* Форма добавления пользователя */}
@@ -200,6 +211,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
                   <SelectItem value="editor">{currentT.roles.editor}</SelectItem>
                   <SelectItem value="viewer">{currentT.roles.viewer}</SelectItem>
                   <SelectItem value="chinese_only">{currentT.roles.chinese_only}</SelectItem>
+                  <SelectItem value="broker">{currentT.roles.broker || 'Брокер'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -336,6 +348,11 @@ const UserManagement: React.FC<UserManagementProps> = ({ language }) => {
           </Card>
         ))}
       </div>
+
+      {/* Модальное окно настройки прав брокеров */}
+      {showBrokerPermissions && (
+        <BrokerPermissions onClose={() => setShowBrokerPermissions(false)} />
+      )}
     </div>
   );
 };

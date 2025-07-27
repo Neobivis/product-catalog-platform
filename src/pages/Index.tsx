@@ -6,7 +6,7 @@ import { useProductsData } from '@/hooks/useProductsData';
 import { useProductOperations } from '@/hooks/useProductOperations';
 import { useFilters } from '@/hooks/useFilters';
 import { getRussianFields } from '@/utils/productHelpers';
-import { hasPermission } from '@/types/user';
+import { hasPermission, canViewSection } from '@/types/user';
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { ensureDataForVictor } from '@/utils/victorDataSync';
 import MainHeader from '@/components/MainHeader';
