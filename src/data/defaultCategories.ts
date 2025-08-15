@@ -52,5 +52,10 @@ export const defaultCategories: Category[] = [
       id: 'auto',
       name: 'Автотовары',
       icon: 'Car'
+    },
+    {
+      id: 'price_request',
+      name: 'Запрос цены',
+      icon: 'MessageSquare'
     }
 ];

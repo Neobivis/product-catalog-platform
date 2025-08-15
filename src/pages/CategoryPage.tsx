@@ -7,9 +7,9 @@ import ProductCatalog from '@/components/ProductCatalog';
 import Pagination from '@/components/Pagination';
 import ImageModal from '@/components/ImageModal';
 import MainHeader from '@/components/MainHeader';
-import MainContent from '@/components/MainContent';
 import { useProductsData } from '@/hooks/useProductsData';
 import { useProductOperations } from '@/hooks/useProductOperations';
+import { useUserManagement } from '@/hooks/useUserManagement';
 import { Product, Category, Language } from '@/types/product';
 import { getRussianFields } from '@/utils/productHelpers';
 import { translations } from '@/utils/translations';
@@ -38,14 +38,9 @@ const CategoryPage: React.FC = () => {
   });
   const [activeTab, setActiveTab] = useState('catalog');
   
-  // States for MainContent
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState({min: 0, max: 10000});
-  
   // Get data from hook
-  const { products, setProducts, categories, setCategories } = useProductsData();
+  const { products, setProducts, categories } = useProductsData();
+  const { authState } = useUserManagement();
   
   // Get product operations for editing
   const {
@@ -64,6 +59,13 @@ const CategoryPage: React.FC = () => {
   } = useProductOperations(products, setProducts);
   
   const t = translations[language];
+
+  // Автоматическое переключение на китайский для пользователей chinese_only и victor
+  useEffect(() => {
+    if (authState.currentUser?.role === 'chinese_only' || authState.currentUser?.role === 'victor') {
+      setLanguage('cn');
+    }
+  }, [authState.currentUser]);
 
   // Find category by path
   const findCategoryByPath = (cats: Category[], path: string): Category | null => {
@@ -84,40 +86,54 @@ const CategoryPage: React.FC = () => {
   const filterProductsByCategory = (categoryPath: string): Product[] => {
     const decodedPath = categoryPath.split('/').map(part => decodeURIComponent(part)).join('/');
     console.log('Filtering products for path:', decodedPath);
-    console.log('Available products:', products.map(p => ({ name: p.nameRu, category: p.category })));
+    console.log('Available products:', products.map(p => ({ name: p.nameRu, category: p.category, additionalCategories: p.additionalCategories })));
     
     const filtered = products.filter(product => {
-      const normalizedProductCategory = product.category.trim();
       const normalizedSearchPath = decodedPath.trim();
       
       // Extract the last part of the search path (leaf category)
       const searchPathParts = normalizedSearchPath.split('/');
       const leafCategory = searchPathParts[searchPathParts.length - 1];
       
-      // Check multiple matching strategies:
-      // 1. Exact match with full path
-      const fullPathMatch = normalizedProductCategory === normalizedSearchPath;
+      // Helper function to check if a category matches
+      const checkCategoryMatch = (categoryToCheck: string) => {
+        const normalizedCategory = categoryToCheck.trim();
+        
+        // 1. Exact match with full path
+        const fullPathMatch = normalizedCategory === normalizedSearchPath;
+        
+        // 2. Product category starts with search path
+        const startsWithMatch = normalizedCategory.startsWith(normalizedSearchPath);
+        
+        // 3. Product category ends with leaf category (for backwards compatibility)
+        const leafMatch = normalizedCategory === leafCategory || 
+                         normalizedCategory.endsWith('/' + leafCategory);
+        
+        return fullPathMatch || startsWithMatch || leafMatch;
+      };
       
-      // 2. Product category starts with search path
-      const startsWithMatch = normalizedProductCategory.startsWith(normalizedSearchPath);
+      // Check primary category
+      const primaryMatches = checkCategoryMatch(product.category);
       
-      // 3. Product category ends with leaf category (for backwards compatibility)
-      const leafMatch = normalizedProductCategory === leafCategory || 
-                       normalizedProductCategory.endsWith('/' + leafCategory);
+      // Check additional categories
+      const additionalMatches = product.additionalCategories && 
+        product.additionalCategories.some(addCat => checkCategoryMatch(addCat));
       
-      const matches = fullPathMatch || startsWithMatch || leafMatch;
+      const matches = primaryMatches || additionalMatches;
       
-      console.log(`Comparing "${normalizedProductCategory}" with "${normalizedSearchPath}":`, {
-        fullPathMatch,
-        startsWithMatch, 
-        leafMatch,
+      console.log(`Checking product "${product.nameRu}":`, {
+        primaryCategory: product.category,
+        additionalCategories: product.additionalCategories,
+        searchPath: normalizedSearchPath,
+        primaryMatches,
+        additionalMatches,
         matches
       });
       
       return matches;
     });
     
-    console.log('Filtered products:', filtered.map(p => ({ name: p.nameRu, category: p.category })));
+    console.log('Filtered products:', filtered.map(p => ({ name: p.nameRu, category: p.category, additionalCategories: p.additionalCategories })));
     return filtered;
   };
 
@@ -236,44 +252,36 @@ const CategoryPage: React.FC = () => {
     setProducts(updatedProducts);
   };
 
+  const handleAdditionalCategoriesChange = (productId: string, additionalCategories: string[]) => {
+    setProducts(prev => prev.map(product => 
+      product.id === productId 
+        ? { ...product, additionalCategories }
+        : product
+    ));
+  };
+
+  const handlePriceRequest = (productId: string) => {
+    setProducts(prev => prev.map(product => {
+      if (product.id === productId) {
+        const updatedAdditionalCategories = product.additionalCategories || [];
+        
+        // Добавляем категорию "Запрос цены", если её ещё нет
+        if (!updatedAdditionalCategories.includes('Запрос цены')) {
+          updatedAdditionalCategories.push('Запрос цены');
+        }
+
+        return {
+          ...product,
+          price: 0, // Обнуляем цену
+          additionalCategories: updatedAdditionalCategories
+        };
+      }
+      return product;
+    }));
+  };
+
   // Get all unique categories for form
   const allCategories = Array.from(new Set(products.map(p => p.category))).filter(Boolean);
-  
-  // Get all unique brands
-  const brands = Array.from(new Set(products.map(p => p.brand))).filter(Boolean);
-  
-  // Filter toggle functions
-  const onToggleBrandFilter = (brand: string) => {
-    setSelectedBrands(prev => 
-      prev.includes(brand) 
-        ? prev.filter(b => b !== brand)
-        : [...prev, brand]
-    );
-  };
-  
-  const onToggleCategoryFilter = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
-  
-  // Filter products for MainContent
-  const filteredProductsForMainContent = useMemo(() => {
-    return products.filter(product => {
-      const matchesSearch = !searchQuery || 
-        product.nameRu?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.nameEn?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
-      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
-      const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
-      
-      return matchesSearch && matchesBrand && matchesCategory && matchesPrice;
-    });
-  }, [products, searchQuery, selectedBrands, selectedCategories, priceRange]);
 
   const addProduct = () => {
     if (newProduct.nameEn && newProduct.price > 0) {
@@ -311,17 +319,6 @@ const CategoryPage: React.FC = () => {
 
   const breadcrumb = getBreadcrumb();
 
-  // Debug info
-  console.log('CategoryPage render:', { categoryPath, isLoading, products: products.length, filteredProducts: filteredProducts.length });
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg">Загрузка...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <MainHeader
@@ -339,42 +336,8 @@ const CategoryPage: React.FC = () => {
         setActiveTab={setActiveTab}
       />
 
-      {/* Show MainContent for other tabs */}
-      {activeTab !== 'catalog' ? (
-        <MainContent
-          activeTab={activeTab}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedBrands={selectedBrands}
-          selectedCategories={selectedCategories}
-          priceRange={priceRange}
-          setPriceRange={setPriceRange}
-          brands={brands}
-          categories={categories}
-          filteredProducts={filteredProductsForMainContent}
-          products={products}
-          language={language}
-          translations={t}
-          onToggleBrandFilter={onToggleBrandFilter}
-          onToggleCategoryFilter={onToggleCategoryFilter}
-          editingField={editingField}
-          setEditingField={setEditingField}
-          onFieldEdit={handleFieldEdit}
-          onImageNavigation={handleImageNavigation}
-          showImageManager={showImageManager}
-          setShowImageManager={setShowImageManager}
-          newImageUrl={newImageUrl}
-          setNewImageUrl={setNewImageUrl}
-          onFileUpload={handleFileUpload}
-          onAddImageByUrl={addImageByUrl}
-          onRemoveImage={removeImageFromProduct}
-          onSetCurrentImage={setCurrentImage}
-          onUpdateCategories={setCategories}
-        />
-      ) : (
-        <>
-          {/* Header */}
-          <div className="bg-white shadow-sm border-b">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
           <nav className="mb-4">
@@ -471,6 +434,8 @@ const CategoryPage: React.FC = () => {
               onImageNavigation={handleImageNavigation}
               onShowImageManager={setShowImageManager}
               onImageClick={setSelectedProduct}
+              onAdditionalCategoriesChange={handleAdditionalCategoriesChange}
+              onPriceRequest={handlePriceRequest}
             />
 
             {/* Bottom Pagination */}
@@ -509,8 +474,6 @@ const CategoryPage: React.FC = () => {
           />
         )}
       </div>
-      </>
-      )}
     </div>
   );
 };

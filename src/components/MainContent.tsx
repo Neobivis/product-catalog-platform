@@ -6,6 +6,7 @@ import ProductCatalog from '@/components/ProductCatalog';
 import ImageManager from '@/components/ImageManager';
 import ImageModal from '@/components/ImageModal';
 import CategoryManager from '@/components/CategoryManager';
+import UserManagement from '@/components/UserManagement';
 
 interface MainContentProps {
   activeTab: string;
@@ -36,6 +37,8 @@ interface MainContentProps {
   onRemoveImage: (productId: string, imageIndex: number) => void;
   onSetCurrentImage: (productId: string, index: number) => void;
   onUpdateCategories: (categories: Category[]) => void;
+  onAdditionalCategoriesChange: (productId: string, categories: string[]) => void;
+  onPriceRequest: (productId: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -66,7 +69,9 @@ const MainContent: React.FC<MainContentProps> = ({
   onAddImageByUrl,
   onRemoveImage,
   onSetCurrentImage,
-  onUpdateCategories
+  onUpdateCategories,
+  onAdditionalCategoriesChange,
+  onPriceRequest
 }) => {
   const [modalProduct, setModalProduct] = useState<Product | null>(null);
 
@@ -98,6 +103,10 @@ const MainContent: React.FC<MainContentProps> = ({
     if (modalProduct) {
       onImageNavigation(modalProduct.id, 'next');
     }
+  };
+
+  const handleAdditionalCategoriesChange = (productId: string, categories: string[]) => {
+    onAdditionalCategoriesChange(productId, categories);
   };
   return (
     <main className="max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
@@ -133,16 +142,27 @@ const MainContent: React.FC<MainContentProps> = ({
           onImageNavigation={onImageNavigation}
           onShowImageManager={setShowImageManager}
           onImageClick={handleImageClick}
+          onAdditionalCategoriesChange={handleAdditionalCategoriesChange}
+          onPriceRequest={onPriceRequest}
         />
       )}
 
       {/* Admin Tab */}
       {activeTab === 'admin' && (
-        <CategoryManager
-          categories={categories}
-          onUpdateCategories={onUpdateCategories}
-          translations={t}
-        />
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">{t.categoryManagement || 'Управление категориями'}</h2>
+            <CategoryManager
+              categories={categories}
+              onUpdateCategories={onUpdateCategories}
+              translations={t}
+            />
+          </div>
+          
+          <div>
+            <UserManagement language={language} />
+          </div>
+        </div>
       )}
 
       {activeTab === 'favorites' && (
